@@ -1,0 +1,43 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon index.js",
+        "email-server": "nodemon queue/workerQueue.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@prisma/client": "^6.11.1",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.3",
+        "axios": "^1.11.0",
+        "bcrypt": "^6.0.0",
+        "bullmq": "^5.56.4",
+        "cloudinary": "^1.30.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "google-auth-library": "^10.2.1",
+        "googleapis": "^152.0.0",
+        "ioredis": "^5.6.1",
+        "jsonwebtoken": "^9.0.2",
+        "multer": "^2.0.2",
+        "multer-storage-cloudinary": "^4.0.0",
+        "nodemailer": "^7.0.5",
+        "nodemon": "^3.1.10",
+        "prisma": "^6.11.1",
+        "redis": "^5.6.0",
+        "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "@types/node": "^24.0.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    }
+}
