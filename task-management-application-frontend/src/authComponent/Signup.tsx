@@ -1,25 +1,18 @@
 import React, { useState } from "react";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  Target,
-  User,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Target, User } from "lucide-react";
 import ProfileImageUpload from "./FileUpload";
 import { Link, useNavigate } from "react-router";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/userSlice";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
 
 // TypeScript Interfaces
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   icon?: React.ReactNode;
 }
-
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "google";
@@ -64,12 +57,7 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
-const Input = ({
-  label,
-  icon,
-  className = "",
-  ...props
-}: InputProps) => {
+const Input = ({ label, icon, className = "", ...props }: InputProps) => {
   return (
     <div className="w-full">
       {label && (
@@ -96,7 +84,6 @@ const Input = ({
   );
 };
 
-
 const Card: React.FC<CardProps> = ({ children, className = "" }) => {
   return (
     <div
@@ -119,34 +106,44 @@ const SignupPage: React.FC = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    profileImage: ""
+    profileImage: "",
   });
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleInputChange = (e: any) => {
-    setDetails((prevState) => ({ ...prevState, [e.target.name]: e.target.value }))
+    setDetails((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleRegisterUser = async (e: any) => {
-    setLoader(true)
+    setLoader(true);
     e.preventDefault();
-    const formData = new FormData()
-    formData.append("name", deatils.name)
-    formData.append("email", deatils.email)
-    formData.append("password", deatils.password)
-    formData.append("profileImage", deatils.profileImage)
+    const formData = new FormData();
+    formData.append("name", deatils.name);
+    formData.append("email", deatils.email);
+    formData.append("password", deatils.password);
+    formData.append("profileImage", deatils.profileImage);
 
-    try{
-      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/createUser`, formData, { withCredentials: true })
-    dispatch(loginSuccess(res.data.data))
-    setLoader(false)
-    navigate("/member/dashboard")
-    }catch(err){
-      setLoader(false)
-      console.log(err)
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/user/createUser`,
+        formData,
+        { withCredentials: true }
+      );
+      dispatch(loginSuccess(res.data.data));
+      console.log(res.data.data);
+      toast.success("Signup Successfull");
+      setLoader(false);
+      navigate("/member/dashboard");
+    } catch (err) {
+      setLoader(false);
+      toast.error("User Already Exists");
+      console.log(err);
     }
-  }
+  };
 
   // const loginwithGoogle = useGoogleLogin({
   //   onSuccess: (tokenResponse: any) => handleGoogleSignup(tokenResponse),
@@ -154,13 +151,16 @@ const SignupPage: React.FC = () => {
   // });
 
   const handleGoogleSignup = async (data: any) => {
-    console.log(data)
+    console.log(data);
     if (data.code !== "") {
-      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/signup-with-google?code=${data.code}`)
-      console.log(res)
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/user/signup-with-google?code=${
+          data.code
+        }`
+      );
+      console.log(res);
     }
-  }
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -222,7 +222,11 @@ const SignupPage: React.FC = () => {
                   className="absolute right-3 top-8 sm:top-9 text-gray-400 hover:text-gray-600 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff size={18} className="sm:w-5 sm:h-5" /> : <Eye size={18} className="sm:w-5 sm:h-5" />}
+                  {showPassword ? (
+                    <EyeOff size={18} className="sm:w-5 sm:h-5" />
+                  ) : (
+                    <Eye size={18} className="sm:w-5 sm:h-5" />
+                  )}
                 </button>
               </div>
 
@@ -261,7 +265,10 @@ const SignupPage: React.FC = () => {
                 id="terms"
                 className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label htmlFor="terms" className="text-xs sm:text-sm text-gray-600">
+              <label
+                htmlFor="terms"
+                className="text-xs sm:text-sm text-gray-600"
+              >
                 I agree to the{" "}
                 <button
                   type="button"
@@ -280,21 +287,22 @@ const SignupPage: React.FC = () => {
             </div>
 
             {/* Create Account Button */}
+              {loader ? (
             <Button
               variant="primary"
               className="w-full"
               size="lg"
               type="submit"
-              onClick={(e) => { handleRegisterUser(e) }}
+              onClick={(e) => {
+                handleRegisterUser(e);
+              }}
             >
-              {loader ?
-                (<>
-                  <div className="animate-spin text-white font-bold rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2"></div>
-                </>) :
-                (<>
-                  Create Account
+                <>
+                  <div className="animate-spin text-white font-bold rounded-full  w-full border-b-2"></div>
                 </>
-                )}
+              ) : (
+                <>Create Account</>
+              )}
             </Button>
 
             {/* Divider */}
@@ -330,7 +338,7 @@ const SignupPage: React.FC = () => {
                 >
                   Login
                 </button>
-              </ Link>
+              </Link>
             </p>
           </div>
         </Card>

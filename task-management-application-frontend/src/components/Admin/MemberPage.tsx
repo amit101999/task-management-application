@@ -1,46 +1,61 @@
-import React, { useEffect, useState } from 'react';
-import { Search, Plus, Mail, MoreHorizontal, Filter, User, Crown, Shield, Users, Eye, MessageCircleIcon } from 'lucide-react';
-import SideBar from '../../sharedComponents/Admin/SideBar';
-import Header from '../../sharedComponents/Admin/Header';
-import { UsefetchUsers } from '../../hooks/hookUsers';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../redux/store';
-import { useDispatch } from 'react-redux';
-import { clearFilter, filterUser, filterUserByDepartment } from '../../redux/userSlice';
+import React, { useEffect, useState } from "react";
+import {
+  Search,
+  Plus,
+  Mail,
+  MoreHorizontal,
+  Filter,
+  User,
+  Crown,
+  Shield,
+  Users,
+  Eye,
+  MessageCircleIcon,
+} from "lucide-react";
+import SideBar from "../../sharedComponents/Admin/SideBar";
+import Header from "../../sharedComponents/Admin/Header";
+import { UsefetchUsers } from "../../hooks/hookUsers";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store";
+import { useDispatch } from "react-redux";
+import {
+  clearFilter,
+  filterUser,
+  filterUserByDepartment,
+} from "../../redux/userSlice";
 
 const MembersPage = () => {
+  UsefetchUsers();
 
-  UsefetchUsers()
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRole, setSelectedRole] = useState('All');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRole, setSelectedRole] = useState("All");
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const { filteredUser } = useSelector((state: RootState) => state.user)
-  const dispatch = useDispatch()
-  console.log(filteredUser[0])
+  const { filteredUser } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
+  console.log(filteredUser[0]);
 
   useEffect(() => {
-    dispatch(filterUser(searchQuery))
-  }, [searchQuery])
+    dispatch(filterUser(searchQuery));
+  }, [searchQuery]);
 
-  useEffect(()=>{
-    if(selectedRole === 'All'){
-      dispatch(clearFilter())
-    }else{
-      console.log('all')
-      dispatch(filterUserByDepartment(selectedRole))
+  useEffect(() => {
+    if (selectedRole === "All") {
+      dispatch(clearFilter());
+    } else {
+      console.log("all");
+      dispatch(filterUserByDepartment(selectedRole));
     }
-  },[selectedRole])
+  }, [selectedRole]);
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'DEVELOPER':
+      case "DEVELOPER":
         return <Crown className="w-4 h-4 text-amber-600" />;
-      case 'DESIGNER':
+      case "DESIGNER":
         return <Shield className="w-4 h-4 text-blue-600" />;
-      case 'TESTER':
+      case "TESTER":
         return <User className="w-4 h-4 text-green-600" />;
-      case 'DEVOPS':
+      case "DEVOPS":
         return <User className="w-4 h-4 text-purple-600" />;
       default:
         return <User className="w-4 h-4 text-gray-600" />;
@@ -49,16 +64,16 @@ const MembersPage = () => {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'Admin':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'Manager':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'Developer':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'Designer':
-        return 'bg-purple-50 text-purple-700 border-purple-200';
+      case "Admin":
+        return "bg-amber-50 text-amber-700 border-amber-200";
+      case "Manager":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      case "Developer":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "Designer":
+        return "bg-purple-50 text-purple-700 border-purple-200";
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
+        return "bg-gray-50 text-gray-700 border-gray-200";
     }
   };
 
@@ -139,30 +154,41 @@ const MembersPage = () => {
                       <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Joined
                       </th>
-                      <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
                         View profile
                       </th>
                        <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Message
-                      </th>
+                      </th> */}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {filteredUser?.map((member, index) => (
-                      <tr key={member.id} className="hover:bg-gray-50 transition-colors">
+                      <tr
+                        key={member.id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
                               <img src={member?.avatar} />
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900">{member.name}</div>
-                              <div className="text-sm text-gray-500">{member.email}</div>
+                              <div className="font-medium text-gray-900">
+                                {member.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {member.email}
+                              </div>
                             </div>
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${getRoleColor(member.role)}`}>
+                          <div
+                            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${getRoleColor(
+                              member.role
+                            )}`}
+                          >
                             {getRoleIcon(member?.department)}
                             {member?.department}
                           </div>
@@ -173,28 +199,37 @@ const MembersPage = () => {
                           </button>
                         </td>
                         <td className="py-4 px-6">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${member?.status === 'Active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-600'
-                            }`}>
-                            <div className={`w-2 h-2 rounded-full ${member.status === 'Active' || null ? 'bg-green-500' : 'bg-gray-400'}`} />
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                              member?.status === "Active"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                member.status === "Active" || null
+                                  ? "bg-green-500"
+                                  : "bg-gray-400"
+                              }`}
+                            />
                             active
                           </span>
                         </td>
                         <td className="py-4 px-6 text-sm text-gray-600">
-                          {member?.createdAt?.split('T')[0]}
+                          {member?.createdAt?.split("T")[0]}
                           {/* {new Date(member.joinedDate).toLocaleDateString()} */}
                         </td>
-                        <td className="py-4 px-6 text-right">
+                        {/* <td className="py-4 px-6 text-right">
                           <button className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors">
                             <Eye />
                           </button>
-                        </td>
-                         <td className="py-4 px-6 text-right">
+                        </td> */}
+                        {/* <td className="py-4 px-6 text-right">
                           <button className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors">
                             <MessageCircleIcon />
                           </button>
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                   </tbody>
@@ -205,37 +240,57 @@ const MembersPage = () => {
             {/* Members Cards - Mobile & Tablet */}
             <div className="lg:hidden space-y-3 sm:space-y-4">
               {filteredUser?.map((member, index) => (
-                <div key={member.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                <div
+                  key={member.id}
+                  className="bg-white rounded-lg border border-gray-200 p-4"
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm sm:text-base flex-shrink-0">
                         {member.avatar}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{member.name}</div>
-                        <div className="text-xs sm:text-sm text-gray-500 truncate">{member.email}</div>
+                        <div className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                          {member.name}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          {member.email}
+                        </div>
                       </div>
                     </div>
                     <button className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors flex-shrink-0">
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
                   </div>
-                  
+
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-                    <div className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full font-medium border ${getRoleColor(member.role)}`}>
+                    <div
+                      className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full font-medium border ${getRoleColor(
+                        member.role
+                      )}`}
+                    >
                       {getRoleIcon(member?.department)}
                       <span className="truncate">{member?.department}</span>
                     </div>
-                    
+
                     <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
                       {member?.tasks.length} tasks
                     </button>
-                    
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-medium ${member.status === 'Active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-600'
-                      }`}>
-                      <div className={`w-2 h-2 rounded-full ${member.status === 'Active' || null ? 'bg-green-500' : 'bg-gray-400'}`} />
+
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-medium ${
+                        member.status === "Active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          member.status === "Active" || null
+                            ? "bg-green-500"
+                            : "bg-gray-400"
+                        }`}
+                      />
                       active
                     </span>
                   </div>
@@ -248,30 +303,46 @@ const MembersPage = () => {
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="flex items-center gap-2">
                   <Users className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 flex-shrink-0" />
-                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Total Members</h3>
+                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">
+                    Total Members
+                  </h3>
                 </div>
-                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">{filteredUser?.length}</p>
+                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">
+                  {filteredUser?.length}
+                </p>
               </div>
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0" />
-                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Active</h3>
+                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">
+                    Active
+                  </h3>
                 </div>
-                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">{filteredUser?.length}</p>
+                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">
+                  {filteredUser?.length}
+                </p>
               </div>
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="flex items-center gap-2">
                   <Crown className="w-4 sm:w-5 h-4 sm:h-5 text-amber-600 flex-shrink-0" />
-                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Admins</h3>
+                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">
+                    Admins
+                  </h3>
                 </div>
-                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">1</p>
+                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">
+                  1
+                </p>
               </div>
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="flex items-center gap-2">
                   <User className="w-4 sm:w-5 h-4 sm:h-5 text-green-600 flex-shrink-0" />
-                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Developers</h3>
+                  <h3 className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">
+                    Developers
+                  </h3>
                 </div>
-                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">2</p>
+                <p className="text-lg sm:text-2xl font-semibold text-gray-900 mt-1">
+                  2
+                </p>
               </div>
             </div>
           </div>
@@ -282,7 +353,9 @@ const MembersPage = () => {
       {isAddMemberModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Add New Member</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+              Add New Member
+            </h2>
 
             <div className="space-y-4">
               <div>

@@ -19,13 +19,11 @@ import { socket } from "./main";
 import MemberProfile from "./components/Member/Profile";
 
 function App() {
-
   const { user } = useSelector((state: RootState) => state.user);
   useEffect(() => {
     socket.emit("join-user", user?.id);
-    console.log("user id is : ", user?.id)
-  },[])
-
+    console.log("user id is : ", user?.id);
+  }, []);
 
   return (
     <Router>
@@ -46,7 +44,7 @@ function App() {
             </AuthenticateAdminRoutes>
           }
         />
-         <Route
+        <Route
           path="/projects/:id"
           element={
             <AuthenticateAdminRoutes>
@@ -108,7 +106,7 @@ function App() {
             </AuthenticateUserRoutes>
           }
         />
-         <Route
+        <Route
           path="/member/profile"
           element={
             <AuthenticateUserRoutes>

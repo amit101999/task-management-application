@@ -155,7 +155,14 @@ const CreateProject = ({setShowCreateModal } : propType) => {
                 
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
-                Create Project
+                 {loader ? (
+              <>
+                <div className="w-6 h-6 animate-spin rounded-full border-4 border-white border-t-transparent"></div>{" "}
+              </>
+            ) : (
+              <>  Create Project</>
+            )}
+               
               </button>
             </div>
           </div>
