@@ -19,15 +19,15 @@ jobs:
       - name: "check pwd"
         run: pwd
 
-      - name: "run the docker compose cotainer"
-        run: |
-          docker compose down
-          docker compose build --no-cache
-          docker compose up -d
+      # - name: "run the docker compose cotainer"
+      #   run: |
+      #     docker compose down
+      #     docker compose build --no-cache
+      #     docker compose up -d
 
-      - name: "Clean up old Docker images/containers"
-        run: |
-          docker container prune -f
-          docker image prune -af
-          docker volume prune -f
-          # docker builder prune -af
+      # - name: "Clean up old Docker images/containers"
+      #   run: |
+      #     docker container prune -f
+      #     docker image prune -af
+      #     docker volume prune -f
+      #     # docker builder prune -af
