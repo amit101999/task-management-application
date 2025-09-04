@@ -5,8 +5,8 @@ services:
     container_name: backend-container
     ports:
       - "6500:6500"
-    env_file:
-      - ./task-management-application-backend/.env
+    # env_file:
+    #   - ./task-management-application-backend/.env
     depends_on:
       - redis-server
 
