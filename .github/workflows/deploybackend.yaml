@@ -19,14 +19,14 @@ jobs:
       - name: "check pwd"
         run: pwd
 
+      - name: "List of folers and files"
+        run: ls -la
+
       - name: "run the docker compose cotainer"
         run: |
           docker compose down
           docker compose build --no-cache
           docker compose up -d
-
-      - name: "List of folers and files"
-        run: ls -la
 
       - name: "Clean up old Docker images/containers"
         run: |
