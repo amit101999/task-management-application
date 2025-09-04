@@ -14,8 +14,8 @@ services:
     build: ./task-management-application-backend
     container_name: worker-container
     command: ["node", "queue/workerQueue.js"]
-    env_file:
-      - ./task-management-application-backend/.env
+    # env_file:
+    #   - ./task-management-application-backend/.env
     depends_on:
       - redis-server
 
