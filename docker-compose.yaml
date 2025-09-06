@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  backend-service:
+    build: ./task-management-application-backend
+    container_name: backend-container
+    ports:
+      - "6500:6500"
+    env_file:
+      - /home/ubuntu/envs/backend.env
+    depends_on:
+      - redis-server
+
+  worker-service:
+    build: ./task-management-application-backend
+    container_name: worker-container
+    command: ["node", "queue/workerQueue.js"]
+    env_file:
+      - /home/ubuntu/envs/backend.env
+    depends_on:
+      - redis-server
+
+  redis-server:
+    image: redis
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+  # frontend-service:
+  #   build: ./task-management-application-frontend
+  #   container_name: frontend-container
+  #   ports:
+  #     - "4173:4173"
+  #   depends_on:
+  #     - backend-service
