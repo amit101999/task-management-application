@@ -32,5 +32,5 @@ jobs:
           docker compose build
           docker compose up -d
 
-      - name: "Check disk usage after"
+      - name: "Check disk usage after the deployment"
         run: df -h
