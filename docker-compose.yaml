@@ -6,7 +6,7 @@ services:
     ports:
       - "6500:6500"
     env_file:
-      - /home/ubuntu/envs/backend.env
+      - /home/ubuntu/backend.env
     depends_on:
       - redis-server
 
@@ -15,7 +15,7 @@ services:
     container_name: worker-container
     command: ["node", "queue/workerQueue.js"]
     env_file:
-      - /home/ubuntu/envs/backend.env
+      - /home/ubuntu/backend.env
     depends_on:
       - redis-server
 
