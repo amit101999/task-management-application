@@ -1,9 +1,9 @@
-import nodemailer from "nodemailer"
-import {google } from "googleapis"
-const OAuth2 = google.auth.OAuth2
-import dotenv from "dotenv"
-dotenv.config({path : "../.env"})
-console.log("refresh token :",process.env.OAUTH_REFRESH_TOKEN)
+import nodemailer from "nodemailer";
+import { google } from "googleapis";
+const OAuth2 = google.auth.OAuth2;
+import dotenv from "dotenv";
+dotenv.config();
+console.log("refresh token :", process.env.OAUTH_REFRESH_TOKEN);
 
 const oauth2Client = new OAuth2(
   process.env.OAUTH_CLIENT_ID,
@@ -11,15 +11,13 @@ const oauth2Client = new OAuth2(
   "https://developers.google.com/oauthplayground"
 );
 
-
 oauth2Client.setCredentials({
-  refresh_token: process.env.OAUTH_REFRESH_TOKEN
+  refresh_token: process.env.OAUTH_REFRESH_TOKEN,
 });
 
-console.log(process.env.OAUTH_REFRESH_TOKEN)
+console.log(process.env.OAUTH_REFRESH_TOKEN);
 
-
-export  const sendMail = async ({ email, text }) => {
+export const sendMail = async ({ email, text }) => {
   const accessToken = await oauth2Client.getAccessToken();
 
   if (!accessToken?.token) {
