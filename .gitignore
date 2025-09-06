@@ -1,2 +1,2 @@
-task-management-backend/env
-task-management-frontend/env
+task-management-application-backend/.env
+task-management-application-frontend/.env

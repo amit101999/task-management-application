@@ -287,19 +287,15 @@ const SignupPage: React.FC = () => {
             </div>
 
             {/* Create Account Button */}
-              {loader ? (
             <Button
               variant="primary"
               className="w-full"
               size="lg"
               type="submit"
-              onClick={(e) => {
-                handleRegisterUser(e);
-              }}
+              onClick={(e) => handleRegisterUser(e)}
             >
-                <>
-                  <div className="animate-spin text-white font-bold rounded-full  w-full border-b-2"></div>
-                </>
+              {loader ? (
+                <div className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5 mx-auto"></div>
               ) : (
                 <>Create Account</>
               )}
