@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-dotenv.config()
+dotenv.config();
 import cors from "cors";
 import cookieParser from "cookie-parser";
 // import  memberRoute from "./routes/memberRoutes"
@@ -57,6 +57,7 @@ app.use("/api/project", projectRoutes);
 app.use("/api/activity", activityRoutes);
 
 app.get("/check", (req, res) => {
+  console.log("/check route is hit");
   res.send("server isas working fine");
 });
 
