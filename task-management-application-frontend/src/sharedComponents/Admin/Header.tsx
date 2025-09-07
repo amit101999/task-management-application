@@ -1,30 +1,33 @@
-import { Bell, Search } from 'lucide-react'
-import React from 'react'
-import { logoutUser } from '../../redux/userSlice'
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router'
-import type { RootState } from '../../redux/store'
-import { useSelector } from 'react-redux'
-import axios from 'axios'
+import { Bell, Search } from "lucide-react";
+import React from "react";
+import { logoutUser } from "../../redux/userSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
+import type { RootState } from "../../redux/store";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 const Header = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.user);
   const HandleSignOut = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/user/logoutUser`, { withCredentials: true })
+    const res = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/api/user/logoutUser`,
+      { withCredentials: true }
+    );
     dispatch(logoutUser());
-    dispatch(logoutUser())
     navigate("/login");
     // Redirect to login page or perform any other action after logout
-
-  }
+  };
 
   return (
     <div>
       <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6">
         <div className="flex items-center flex-1">
-          <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">
+            Dashboard
+          </h1>
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
@@ -50,14 +53,20 @@ const Header = () => {
               src={user?.avatar}
               className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
             />
-            <span className="hidden sm:block text-sm font-medium text-gray-900">{user?.name}</span>
+            <span className="hidden sm:block text-sm font-medium text-gray-900">
+              {user?.name}
+            </span>
             <button
-              onClick={HandleSignOut} className="text-xs sm:text-sm text-gray-500 hover:text-gray-700">Logout</button>
+              onClick={HandleSignOut}
+              className="text-xs sm:text-sm text-gray-500 hover:text-gray-700"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </header>
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
