@@ -1,49 +1,63 @@
-import axios from 'axios'
-import { Calendar, CheckCircle, Circle, Clock, Filter, Search, Target, User, Users } from 'lucide-react'
-import  { useEffect, useState } from 'react'
-
+import axios from "axios";
+import {
+  Calendar,
+  CheckCircle,
+  Circle,
+  Clock,
+  Filter,
+  Search,
+  Target,
+  Users,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface PropType {
-  selectedProject: ProjectType
-  userId: string | undefined
+  selectedProject: ProjectType;
+  userId: string | undefined;
 }
-  
-const ProjectTask = ( {selectedProject, userId }: PropType) => {
-  const closedTask = selectedProject.tasks?.filter((item) => item.taskStatus === "CLOSED")
-  const progress = (closedTask.length / selectedProject.tasks?.length) * 100
 
-  const [tasks, setTasks] = useState<Task[]>()
+const ProjectTask = ({ selectedProject, userId }: PropType) => {
+  const closedTask = selectedProject.tasks?.filter(
+    (item) => item.taskStatus === "CLOSED"
+  );
+  const progress = (closedTask.length / selectedProject.tasks?.length) * 100;
 
-  useEffect(()=>{
-    setTasks(selectedProject?.tasks)
-  },[selectedProject])
-
-  const [project, setProject] = useState<ProjectType[]>()
+  const [tasks, setTasks] = useState<Task[]>();
 
   useEffect(() => {
+    setTasks(selectedProject?.tasks);
+  }, [selectedProject]);
 
+  // const [project, setProject] = useState<ProjectType[]>()
+
+  useEffect(() => {
     const fetchProjectsByid = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/project/getProject/${selectedProject.id}`, { withCredentials: true });
+        const res = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${
+            selectedProject.id
+          }`
+        );
 
         // console.log("hello",res.data.data.tasks)
-        const data = res.data.data.tasks.filter((item) => item.userid === userId)
+        const data = res.data.data.tasks.filter(
+          (item: any) => item.userid === userId
+        );
         setTasks(data);
       } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error("Error fetching projects:", error);
       }
-    }
-    fetchProjectsByid()
-
-  }, [selectedProject, setTasks])
-
+    };
+    fetchProjectsByid();
+  }, [selectedProject, setTasks]);
 
   const getStatusBadge = (status: string) => {
-    const baseClasses = "px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium";
+    const baseClasses =
+      "px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium";
     switch (status) {
-      case 'Done':
+      case "Done":
         return `${baseClasses} bg-green-100 text-green-800`;
-      case 'In Progress':
+      case "In Progress":
         return `${baseClasses} bg-yellow-100 text-yellow-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
@@ -53,23 +67,22 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
   const getPriorityBadge = (priority: string) => {
     const baseClasses = "px-2 py-1 rounded text-xs font-medium";
     switch (priority) {
-      case 'High':
+      case "High":
         return `${baseClasses} bg-red-100 text-red-800`;
-      case 'Medium':
+      case "Medium":
         return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      case 'Low':
+      case "Low":
         return `${baseClasses} bg-green-100 text-green-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
 
-
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Done':
+      case "Done":
         return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />;
-      case 'In Progress':
+      case "In Progress":
         return <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />;
       default:
         return <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />;
@@ -77,19 +90,19 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
   };
 
   const getProjectStatusBadge = (status: string) => {
-    const baseClasses = "px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium inline-block";
+    const baseClasses =
+      "px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium inline-block";
     switch (status) {
-      case 'COMPLETED':
+      case "COMPLETED":
         return `${baseClasses} bg-green-100 text-green-800`;
-      case 'ACTIVE':
+      case "ACTIVE":
         return `${baseClasses} bg-blue-100 text-blue-800`;
-      case 'UPCOMING':
+      case "UPCOMING":
         return `${baseClasses} bg-gray-100 text-gray-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
-
 
   return (
     <div className="w-full max-w-full overflow-hidden">
@@ -100,8 +113,13 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
             <p className="text-xs sm:text-sm text-gray-600 truncate">Status</p>
             <div className="flex items-center justify-center sm:justify-start">
               <span className={getProjectStatusBadge(selectedProject?.status)}>
-                <span className="hidden sm:inline">{selectedProject?.status}</span>
-                <span className="sm:hidden">{selectedProject?.status?.substring(0, 6)}{selectedProject?.status?.length > 6 ? '...' : ''}</span>
+                <span className="hidden sm:inline">
+                  {selectedProject?.status}
+                </span>
+                <span className="sm:hidden">
+                  {selectedProject?.status?.substring(0, 6)}
+                  {selectedProject?.status?.length > 6 ? "..." : ""}
+                </span>
               </span>
             </div>
           </div>
@@ -110,8 +128,12 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 min-w-0">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm text-gray-600 truncate">Progress</p>
-              <p className="text-base sm:text-lg font-bold text-gray-800">{progress.toFixed(2)}</p>
+              <p className="text-xs sm:text-sm text-gray-600 truncate">
+                Progress
+              </p>
+              <p className="text-base sm:text-lg font-bold text-gray-800">
+                {progress.toFixed(2)}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full flex-shrink-0">
               <Target className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
@@ -123,7 +145,9 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm text-gray-600 truncate">Tasks</p>
-              <p className="text-base sm:text-lg font-bold text-gray-800">{selectedProject.tasks.length}</p>
+              <p className="text-base sm:text-lg font-bold text-gray-800">
+                {selectedProject.tasks.length}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 bg-green-100 rounded-full flex-shrink-0">
               <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
@@ -135,7 +159,9 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm text-gray-600 truncate">Team</p>
-              <p className="text-base sm:text-lg font-bold text-gray-800">{selectedProject?.users?.length || 0}</p>
+              <p className="text-base sm:text-lg font-bold text-gray-800">
+                {selectedProject?.users?.length || 0}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 bg-purple-100 rounded-full flex-shrink-0">
               <Users className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
@@ -148,8 +174,10 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
       <div className="space-y-4">
         {/* Header and Controls - Enhanced Mobile Layout */}
         <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-          <h4 className="text-base sm:text-lg font-medium text-gray-800">Project Tasks</h4>
-          
+          <h4 className="text-base sm:text-lg font-medium text-gray-800">
+            Project Tasks
+          </h4>
+
           {/* Search and Filter Controls */}
           <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-3">
             <div className="relative flex-1 sm:flex-initial">
@@ -188,10 +216,12 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
                       {getStatusIcon(task.taskStatus)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h5 className="font-medium text-gray-800 text-sm sm:text-base break-words">{task.title}</h5>
+                      <h5 className="font-medium text-gray-800 text-sm sm:text-base break-words">
+                        {task.title}
+                      </h5>
                     </div>
                   </div>
-                  
+
                   {task.priority && (
                     <div className="flex-shrink-0 self-start">
                       <span className={getPriorityBadge(task.priority)}>
@@ -206,9 +236,11 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
                   <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-4">
                     <span className="flex items-center text-xs sm:text-sm text-gray-600">
                       <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">Due: {task.dueDate?.split("T")[0]}</span>
+                      <span className="truncate">
+                        Due: {task.dueDate?.split("T")[0]}
+                      </span>
                     </span>
-                    
+
                     <div className="sm:hidden">
                       <span className={getStatusBadge(task.taskStatus)}>
                         {task.taskStatus}
@@ -223,7 +255,7 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
                         {task.taskStatus}
                       </span>
                     </div>
-                    
+
                     <button className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors font-medium">
                       Update Status
                     </button>
@@ -235,7 +267,7 @@ const ProjectTask = ( {selectedProject, userId }: PropType) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProjectTask
+export default ProjectTask;

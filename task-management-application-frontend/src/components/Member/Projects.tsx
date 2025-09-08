@@ -7,20 +7,20 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../redux/store';
 
 const MemberProjects = () => {
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
 
   const { user } = useSelector((store: RootState) => store.user)
   const { filteredProjects } = useSelector((store: RootState) => store.projects);
-  const tasks = user?.tasks
+  // const tasks = user?.tasks
 
-  const returnClosedTask = (project) => {
+  const returnClosedTask = (project: ProjectType) => {
     const closedTask = project?.tasks?.filter((item) => item.taskStatus === "CLOSED")
-    return closedTask
+    return closedTask ?? []
   }
 
-  const getProjectTasks = (projectId: string) => {
-    return tasks?.filter(task => task.id === projectId);
-  };
+  // const getProjectTasks = (projectId: string) => {
+  //   return tasks?.filter(task => task.id === projectId);
+  // };
 
   const getProjectStatusBadge = (status: string) => {
     const baseClasses = "px-3 py-1 rounded-full text-sm font-medium";
@@ -86,12 +86,12 @@ const MemberProjects = () => {
 
                             <div className="flex items-center text-xs sm:text-sm text-gray-600">
                               <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                              <span className="whitespace-nowrap">Due: {project?.endDate.split("T")[0]}</span>
+                              <span className="whitespace-nowrap">Due: {project?.endDate?.split("T")[0]}</span>
                             </div>
 
                             <div className="flex items-center text-xs sm:text-sm text-gray-600">
                               <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                              <span className="whitespace-nowrap">{returnClosedTask(project).length}/{project?.tasks?.length} Task</span>
+                              <span className="whitespace-nowrap">{returnClosedTask(project).length}/{project?.tasks?.length ?? 0} Task</span>
                             </div>
                           </div>
                         </div>
@@ -100,12 +100,12 @@ const MemberProjects = () => {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs sm:text-sm">
                           <span className="text-gray-600">Progress</span>
-                          <span className="font-medium text-gray-800">{Math.round((returnClosedTask(project).length / project?.tasks?.length) * 100) || 0}%</span>
+                          <span className="font-medium text-gray-800">{Math.round((returnClosedTask(project).length / (project?.tasks?.length || 1)) * 100) || 0}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${Math.round((returnClosedTask(project).length / project?.tasks?.length) * 100) || 0}%` }}
+                            style={{ width: `${Math.round((returnClosedTask(project).length / (project?.tasks?.length || 1)) * 100) || 0}%` }}
                           ></div>
                         </div>
                       </div>
@@ -130,8 +130,8 @@ const MemberProjects = () => {
                     <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                   </button>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">{selectedProject.projectName}</h3>
-                    <p className="text-sm sm:text-base text-gray-600 line-clamp-2">{selectedProject.description}</p>
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">{selectedProject?.projectName}</h3>
+                    <p className="text-sm sm:text-base text-gray-600 line-clamp-2">{selectedProject?.description}</p>
                   </div>
                 </div>
                 {/* Project Tasks */}

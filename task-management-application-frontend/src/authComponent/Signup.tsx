@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/userSlice";
-import { useGoogleLogin } from "@react-oauth/google";
+// import { useGoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 
 // TypeScript Interfaces
@@ -130,11 +130,12 @@ const SignupPage: React.FC = () => {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/api/user/createUser`,
-        formData,
-        { withCredentials: true }
+        formData
       );
       dispatch(loginSuccess(res.data.data));
-      console.log(res.data.data);
+      // storing token in localstorage
+      localStorage.setItem("token", JSON.stringify(res.data.token));
+
       toast.success("Signup Successfull");
       setLoader(false);
       navigate("/member/dashboard");
@@ -150,17 +151,17 @@ const SignupPage: React.FC = () => {
   //   flow: 'auth-code',
   // });
 
-  const handleGoogleSignup = async (data: any) => {
-    console.log(data);
-    if (data.code !== "") {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/api/user/signup-with-google?code=${
-          data.code
-        }`
-      );
-      console.log(res);
-    }
-  };
+  // const handleGoogleSignup = async (data: any) => {
+  //   console.log(data);
+  //   if (data.code !== "") {
+  //     const res = await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/api/user/signup-with-google?code=${
+  //         data.code
+  //       }`
+  //     );
+  //     console.log(res);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">

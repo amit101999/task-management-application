@@ -24,9 +24,7 @@ const CreateTask = ({ setShowCreateModal, users, projects }: propType) => {
     userEmail: "",
   });
   const handleChange = (e: any) => {
-    console.log("asdasd");
     setTaskData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    console.log("user email", taskData.userEmail);
   };
 
   const handleSubmit = async () => {
@@ -38,7 +36,13 @@ const CreateTask = ({ setShowCreateModal, users, projects }: propType) => {
     const newTask = await axios.post(
       `${import.meta.env.VITE_BASE_URL}/api/task/createTask`,
       Data,
-      { withCredentials: true }
+      {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(
+            localStorage.getItem("token") || ""
+          )}`,
+        },
+      }
     );
     const data = newTask.data.data;
     disptach(addTask(data));
@@ -139,7 +143,7 @@ const CreateTask = ({ setShowCreateModal, users, projects }: propType) => {
                       console.log(member.email);
                       setTaskData((prev) => ({
                         ...prev,
-                        userEmail: [member.email],
+                        userEmail: member.email,
                       }));
                       handleChange(e);
                     }}

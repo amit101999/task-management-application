@@ -34,15 +34,16 @@ export const createUser = async (req, res) => {
       }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "none", // required for cross-origin
-      secure: false, // because your EC2 is running on plain HTTP
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   sameSite: "none", // required for cross-origin
+    //   secure: false, // because your EC2 is running on plain HTTP
+    //   maxAge: 24 * 60 * 60 * 1000,
+    // });
     res.status(200).json({
       message: "user created successfully",
       data: newUser,
+      token: token,
     });
   } catch (err) {
     console.log(err);
@@ -97,16 +98,19 @@ export const userLogin = async (req, res) => {
       }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "none", // required for cross-origin
-      secure: false, // because your EC2 is running on plain HTTP
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   sameSite: "none", // required for cross-origin
+    //   secure: false, // because your EC2 is running on plain HTTP
+    //   maxAge: 24 * 60 * 60 * 1000,
+    // });
+
+    // using localstorage instead of cookies for storing token
 
     res.status(200).json({
       message: "User logged in successfully",
       data: user,
+      token: token,
     });
   } catch (err) {
     console.log(err);

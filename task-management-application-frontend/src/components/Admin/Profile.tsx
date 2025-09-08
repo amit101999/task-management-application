@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import {
   User,
   Lock,
@@ -20,13 +20,13 @@ const ProfilePage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.user);
   console.log(user);
   // Mock admin data
-  const [adminProfile, setAdminProfile] = useState<UserType | null>();
+  const [adminProfile, setAdminProfile] = useState<UserType | null>(null);
 
   useState(() => {
     setAdminProfile(user);
   });
 
-  const [editForm, setEditForm] = useState(adminProfile);
+  const [editForm, setEditForm] = useState<UserType | null>(adminProfile);
 
   const handleSave = () => {
     setAdminProfile(editForm);
@@ -38,8 +38,8 @@ const ProfilePage: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleInputChange = (field: keyof AdminProfile, value: string) => {
-    setEditForm((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof UserType, value: any) => {
+    setEditForm((prev) => ({ ...(prev ?? {} as UserType), [field]: value } as UserType));
   };
 
   return (
@@ -113,14 +113,16 @@ const ProfilePage: React.FC = () => {
                       {user?.role}
                     </span>
                   </div>
-                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-2">Developer</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-2">
+                    Developer
+                  </p>
                 </div>
 
                 <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
                   <div className="flex items-center gap-3 text-xs sm:text-sm">
                     <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
                     <span className="text-gray-600 truncate">
-                      Joining Date : {user?.createdAt?.split("T")[0]}
+                      Joining Date : {typeof (user as any)?.createdAt === 'string' ? String((user as any)?.createdAt).split("T")[0] : ''}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 text-xs sm:text-sm">
@@ -150,14 +152,16 @@ const ProfilePage: React.FC = () => {
                       {isEditing ? (
                         <input
                           type="text"
-                          value={editForm.name}
+                          value={editForm?.name || ""}
                           onChange={(e) =>
                             handleInputChange("name", e.target.value)
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm lg:text-base"
                         />
                       ) : (
-                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">{user?.name}</p>
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
+                          {user?.name}
+                        </p>
                       )}
                     </div>
 
@@ -168,14 +172,16 @@ const ProfilePage: React.FC = () => {
                       {isEditing ? (
                         <input
                           type="email"
-                          value={editForm.email}
+                          value={editForm?.email || ""}
                           onChange={(e) =>
                             handleInputChange("email", e.target.value)
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm lg:text-base"
                         />
                       ) : (
-                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">{user?.email}</p>
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
+                          {user?.email}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -188,14 +194,16 @@ const ProfilePage: React.FC = () => {
                       {isEditing ? (
                         <input
                           type="tel"
-                          value={editForm.phone}
+                          value={editForm?.phone || 0}
                           onChange={(e) =>
                             handleInputChange("phone", e.target.value)
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm lg:text-base"
                         />
                       ) : (
-                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">{user?.phone}</p>
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
+                          {user?.phone}
+                        </p>
                       )}
                     </div>
 
@@ -205,7 +213,7 @@ const ProfilePage: React.FC = () => {
                       </label>
                       {isEditing ? (
                         <select
-                          value={editForm.department}
+                          value={editForm?.department || ""}
                           onChange={(e) =>
                             handleInputChange("department", e.target.value)
                           }
@@ -218,7 +226,9 @@ const ProfilePage: React.FC = () => {
                           <option value="Sales">Sales</option>
                         </select>
                       ) : (
-                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">{user?.department}</p>
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
+                          {user?.department}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -236,7 +246,9 @@ const ProfilePage: React.FC = () => {
                     <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
                       <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Password</p>
+                        <p className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">
+                          Password
+                        </p>
                         <p className="text-xs sm:text-sm text-gray-600">
                           Last updated 3 months ago
                         </p>

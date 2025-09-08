@@ -1,11 +1,12 @@
 import { Bell, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../redux/userSlice";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import axios from "axios";
+import { logoutUserTask } from "../../redux/taskSlice";
+import { logoutUserProject } from "../../redux/projectSlice";
 
 const Header = () => {
   const { user } = useSelector((state: RootState) => state.user);
@@ -13,10 +14,12 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    // const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/user/logoutUser`, { withCredentials: true })
+    localStorage.removeItem("token");
     dispatch(logoutUser());
+    dispatch(logoutUserTask());
+    dispatch(logoutUserProject());
     navigate("/login");
-  } 
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -36,9 +39,7 @@ const Header = () => {
               src={user?.avatar}
               className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
             />
-            <span className="hidden sm:block text-sm font-medium text-gray-700">
-
-            </span>
+            <span className="hidden sm:block text-sm font-medium text-gray-700"></span>
           </div>
 
           <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors flex space-x-2 ">

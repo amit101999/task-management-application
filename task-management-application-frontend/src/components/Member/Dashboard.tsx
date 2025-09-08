@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Sidebar from '../../sharedComponents/Member/Sidebar';
 import Header from '../../sharedComponents/Member/Header';
@@ -20,27 +20,27 @@ interface TaskData {
   color: string;
 }
 
-interface RecentTask {
-  id: number;
-  taskName: string;
-  projectName: string;
-  status: 'Open' | 'In Progress' | 'Completed';
-  dueDate: string;
-}
+// interface RecentTask {
+//   id: number;
+//   taskName: string;
+//   projectName: string;
+//   status: 'Open' | 'In Progress' | 'Completed';
+//   dueDate: string;
+// }
 
 // Sample data
-const recentTasks: RecentTask[] = [
-  { id: 1, taskName: 'Design Homepage Layout', projectName: 'Website Redesign', status: 'In Progress', dueDate: '2024-08-20' },
-  { id: 2, taskName: 'Setup Database Schema', projectName: 'E-commerce Platform', status: 'Completed', dueDate: '2024-08-15' },
-  { id: 3, taskName: 'User Authentication API', projectName: 'Mobile App', status: 'Open', dueDate: '2024-08-25' },
-  { id: 4, taskName: 'Testing Payment Gateway', projectName: 'E-commerce Platform', status: 'In Progress', dueDate: '2024-08-18' },
-  { id: 5, taskName: 'Create Admin Panel', projectName: 'CRM System', status: 'Open', dueDate: '2024-08-30' },
-  { id: 6, taskName: 'Optimize Performance', projectName: 'Website Redesign', status: 'Completed', dueDate: '2024-08-12' },
-  { id: 7, taskName: 'Implement Search Feature', projectName: 'Mobile App', status: 'In Progress', dueDate: '2024-08-22' }
-];
+// const recentTasks: RecentTask[] = [
+//   { id: 1, taskName: 'Design Homepage Layout', projectName: 'Website Redesign', status: 'In Progress', dueDate: '2024-08-20' },
+//   { id: 2, taskName: 'Setup Database Schema', projectName: 'E-commerce Platform', status: 'Completed', dueDate: '2024-08-15' },
+//   { id: 3, taskName: 'User Authentication API', projectName: 'Mobile App', status: 'Open', dueDate: '2024-08-25' },
+//   { id: 4, taskName: 'Testing Payment Gateway', projectName: 'E-commerce Platform', status: 'In Progress', dueDate: '2024-08-18' },
+//   { id: 5, taskName: 'Create Admin Panel', projectName: 'CRM System', status: 'Open', dueDate: '2024-08-30' },
+//   { id: 6, taskName: 'Optimize Performance', projectName: 'Website Redesign', status: 'Completed', dueDate: '2024-08-12' },
+//   { id: 7, taskName: 'Implement Search Feature', projectName: 'Mobile App', status: 'In Progress', dueDate: '2024-08-22' }
+// ];
 
 // Components
-const WelcomeSection: React.FC = ({ openProject, openTask }: { openProject: ProjectType[], openTask: Task[] }) => {
+const WelcomeSection = ({ openProject, openTask }: { openProject: ProjectType[] | undefined, openTask: Task[] | undefined }) => {
   return (
     <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-blue-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-white mb-4 sm:mb-6 lg:mb-8 shadow-lg mx-3 sm:mx-0">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -61,13 +61,13 @@ const WelcomeSection: React.FC = ({ openProject, openTask }: { openProject: Proj
   );
 };
 
-const ProjectsChart: React.FC = ({ projects, activeProject, completedProject, upcompingProject }: any) => {
+const ProjectsChart = ({ projects, activeProject, completedProject, upcompingProject }: any) => {
   console.log(projects?.legth)
   const projectsData: ProjectData[] = [
-    { name: 'All Projects', value: projects?.length, color: '#8B5CF6' },
-    { name: 'Active', value: activeProject?.length, color: '#10B981' },
-    { name: 'Completed', value: completedProject?.length, color: '#3B82F6' },
-    { name: 'Upcoming', value: upcompingProject?.length, color: '#F59E0B' }
+    { name: 'All Projects', value: projects?.length ?? 0, color: '#8B5CF6' },
+    { name: 'Active', value: activeProject?.length ?? 0, color: '#10B981' },
+    { name: 'Completed', value: completedProject?.length ?? 0, color: '#3B82F6' },
+    { name: 'Upcoming', value: upcompingProject?.length ?? 0, color: '#F59E0B' }
   ];
 
   return (
@@ -109,7 +109,7 @@ const ProjectsChart: React.FC = ({ projects, activeProject, completedProject, up
   );
 };
 
-const TasksChart: React.FC = ({ tasks, openTask, closedTask, inprogresTask }: any) => {
+const TasksChart = ({ openTask, closedTask, inprogresTask }: any) => {
 
   const tasksData: TaskData[] = [
     { name: 'Open', value: openTask?.length || 0, color: '#3B82F6' },

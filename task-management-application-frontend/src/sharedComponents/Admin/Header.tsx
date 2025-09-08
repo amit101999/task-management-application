@@ -1,22 +1,22 @@
 import { Bell, Search } from "lucide-react";
-import React from "react";
+// import React from "react";
 import { logoutUser } from "../../redux/userSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import type { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import { logoutUserTask } from "../../redux/taskSlice";
+import { logoutUserProject } from "../../redux/projectSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.user);
   const HandleSignOut = async () => {
-    const res = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/api/user/logoutUser`,
-      { withCredentials: true }
-    );
+    localStorage.removeItem("token");
     dispatch(logoutUser());
+    dispatch(logoutUserTask());
+    dispatch(logoutUserProject());
     navigate("/login");
     // Redirect to login page or perform any other action after logout
   };

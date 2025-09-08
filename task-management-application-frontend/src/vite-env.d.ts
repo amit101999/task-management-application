@@ -47,7 +47,7 @@ interface UserTask {
 interface UserType {
   id: string,
   name: string,
-  avatar: string?,
+  avatar?: string,
   role: string,
   email: string
   password?: string,

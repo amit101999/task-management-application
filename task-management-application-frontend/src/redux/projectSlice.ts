@@ -27,7 +27,8 @@ const projectSlice = createSlice({
     },
     selectprojectById: (state, action: PayloadAction<string>) => {
       state.selectedProjectId =
-        state?.projects.find((project) => project.id === action.payload) || null;
+        state?.projects.find((project) => project.id === action.payload) ||
+        null;
     },
     filterProjects: (state, action: PayloadAction<string>) => {
       if (action.payload === "ALL") {
@@ -38,9 +39,19 @@ const projectSlice = createSlice({
         );
       }
     },
+    logoutUserProject: (state) => {
+      state.projects = [];
+      state.selectedProjectId = null;
+      state.filteredProjects = [];
+    },
   },
 });
 
 export default projectSlice.reducer;
-export const { addProject, getAllProject, selectprojectById, filterProjects } =
-  projectSlice.actions;
+export const {
+  addProject,
+  getAllProject,
+  selectprojectById,
+  logoutUserProject,
+  filterProjects,
+} = projectSlice.actions;

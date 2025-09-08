@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import {
   User,
   Lock,
@@ -38,8 +38,8 @@ const MemberProfile: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleInputChange = (field: keyof AdminProfile, value: string) => {
-    setEditForm((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof UserType, value: string) => {
+    setEditForm((prev) => ({ ...(prev ?? {} as UserType), [field]: value } as UserType));
   };
 
   return (
@@ -120,7 +120,7 @@ const MemberProfile: React.FC = () => {
                   <div className="flex items-center gap-3 text-xs sm:text-sm">
                     <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
                     <span className="text-gray-600 truncate">
-                      Joining Date : {user?.createdAt?.split("T")[0]}
+                      Joining Date : {typeof (user as any)?.createdAt === 'string' ? String((user as any)?.createdAt).split("T")[0] : ''}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 text-xs sm:text-sm">
@@ -150,7 +150,7 @@ const MemberProfile: React.FC = () => {
                       {isEditing ? (
                         <input
                           type="text"
-                          value={editForm.name}
+                          value={editForm?.name ?? ""}
                           onChange={(e) =>
                             handleInputChange("name", e.target.value)
                           }
@@ -168,7 +168,7 @@ const MemberProfile: React.FC = () => {
                       {isEditing ? (
                         <input
                           type="email"
-                          value={editForm.email}
+                          value={editForm?.email ?? ""}
                           onChange={(e) =>
                             handleInputChange("email", e.target.value)
                           }
@@ -188,7 +188,7 @@ const MemberProfile: React.FC = () => {
                       {isEditing ? (
                         <input
                           type="tel"
-                          value={editForm.phone}
+                          value={editForm?.phone ?? 0}
                           onChange={(e) =>
                             handleInputChange("phone", e.target.value)
                           }
@@ -205,7 +205,7 @@ const MemberProfile: React.FC = () => {
                       </label>
                       {isEditing ? (
                         <select
-                          value={editForm.department}
+                          value={editForm?.department ?? ""}
                           onChange={(e) =>
                             handleInputChange("department", e.target.value)
                           }

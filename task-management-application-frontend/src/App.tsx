@@ -12,7 +12,7 @@ import SignupPage from "./authComponent/Signup";
 import AuthenticateUserRoutes from "./HOC/AuthenticateUserRoutes";
 import AuthenticateAdminRoutes from "./HOC/AutenticateAdminRoutes";
 import ProjectDetailsPage from "./components/Admin/ProjectDetailsPage";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "./redux/store";
 import { socket } from "./main";
@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     socket.emit("join-user", user?.id);
     console.log("user id is : ", user?.id);
-  }, []);
+  }, [user?.id]);
 
   return (
     <Router>

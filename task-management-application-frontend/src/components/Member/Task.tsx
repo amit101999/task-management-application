@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Calendar,
@@ -13,24 +13,29 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { clearFilter, filterByStatus, filterTaskByText, updateTaskStatus } from "../../redux/taskSlice";
-import { UsefetchTaskByUserId } from "../../hooks/hookTask";
+import {
+  clearFilter,
+  filterByStatus,
+  filterTaskByText,
+  updateTaskStatus,
+} from "../../redux/taskSlice";
+// import { UsefetchTaskByUserId } from "../../hooks/hookTask";
 
 const TaskDashboard: React.FC = () => {
   const dispatch = useDispatch();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");  
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const { filterTasks } = useSelector((state: RootState) => state.tasks);
-  console.log(filterTasks)
+  console.log(filterTasks);
 
   const filterTaskByStatus = (text: string) => {
     // console.log("text")
     if (text === "ALL") {
-      dispatch(clearFilter())
+      dispatch(clearFilter());
       return;
     }
-    dispatch(filterByStatus(text.toUpperCase()))
+    dispatch(filterByStatus(text.toUpperCase()));
   };
 
   useEffect(() => {
@@ -39,10 +44,10 @@ const TaskDashboard: React.FC = () => {
 
   const filterBySearch = (text: string) => {
     if (text === "") {
-        dispatch(clearFilter())
+      dispatch(clearFilter());
       return;
     }
-   dispatch(filterTaskByText(text))
+    dispatch(filterTaskByText(text));
   };
 
   useEffect(() => {
@@ -52,16 +57,23 @@ const TaskDashboard: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "Done":
-        return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />;
+        return (
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+        );
       case "In Progress":
-        return <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" />;
+        return (
+          <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" />
+        );
       default:
-        return <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />;
+        return (
+          <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+        );
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const baseClasses = "px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium inline-flex items-center justify-center";
+    const baseClasses =
+      "px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium inline-flex items-center justify-center";
     switch (status) {
       case "OPEN":
         return `${baseClasses} bg-green-100 text-green-800`;
@@ -72,18 +84,32 @@ const TaskDashboard: React.FC = () => {
     }
   };
 
-  const handleChangeStatus = async(id: string, status: string) => {
-     try{
-       dispatch(updateTaskStatus({ id: id, status: status }))
-      console.log(filterTasks)
-      const res = await axios.put(`${import.meta.env.VITE_BASE_URL}/api/task/updateTaskStatus/${id}`,{data : status}, {withCredentials : true} )
-      console.log(res.data)
-     }catch(err){
-      console.log("Error in updating task status",err)
-      dispatch(updateTaskStatus({ id: id, status: "OPEN" }))
-     }
-  }
-  
+  const handleChangeStatus = async (
+    id: string | undefined,
+    status: "OPEN" | "INPROGRESS" | "CLOSED"
+  ) => {
+    try {
+      if (!id) return;
+      dispatch(updateTaskStatus({ id: id, status: status }));
+      console.log(filterTasks);
+      const res = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}/api/task/updateTaskStatus/${id}`,
+        { data: status },
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(
+              localStorage.getItem("token") || ""
+            )}`,
+          },
+        }
+      );
+      console.log(res.data);
+    } catch (err) {
+      console.log("Error in updating task status", err);
+      if (id) dispatch(updateTaskStatus({ id: id, status: "OPEN" }));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans flex flex-col lg:flex-row">
       {/* Sidebar */}
@@ -189,14 +215,18 @@ const TaskDashboard: React.FC = () => {
                         {task.taskStatus !== "CLOSED" && (
                           <>
                             <button
-                              onClick={() => handleChangeStatus(task?.id, "CLOSED")}
+                              onClick={() =>
+                                handleChangeStatus(task?.id, "CLOSED")
+                              }
                               className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors font-medium text-center"
                             >
                               Mark Complete
                             </button>
                             {task.taskStatus !== "INPROGRESS" && (
                               <button
-                                onClick={() => handleChangeStatus(task?.id, "INPROGRESS")}
+                                onClick={() =>
+                                  handleChangeStatus(task?.id, "INPROGRESS")
+                                }
                                 className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors font-medium text-center"
                               >
                                 Work Started

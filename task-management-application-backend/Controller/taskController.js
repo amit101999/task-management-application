@@ -1,14 +1,17 @@
-
 import prisma from "../config/prisma.config.js";
 import { io } from "../index.js";
 import { queue } from "../queue/emailQueue.js";
 
 export const createtask = async (req, res) => {
-  const { title, description, dueDate, projectName, assignedUser, userEmail } = req.body;
+  const { title, description, dueDate, projectName, assignedUser, userEmail } =
+    req.body;
 
   try {
-
-    io.to(assignedUser).emit("newActivity", { activityType: "New Task Added", description: title, createdAt: new Date() });
+    io.to(assignedUser).emit("newActivity", {
+      activityType: "New Task Added",
+      description: title,
+      createdAt: new Date(),
+    });
     const task = await prisma.task.create({
       data: {
         title,
@@ -27,8 +30,8 @@ export const createtask = async (req, res) => {
       },
       include: {
         assignedTo: true,
-        project: true
-      }
+        project: true,
+      },
     });
 
     // updating the projet as the a new taks then it will also add a new user to the project
@@ -47,22 +50,21 @@ export const createtask = async (req, res) => {
         userid: assignedUser,
         description: description,
         createdAt: new Date(),
-        activityType: "New Task Added"
-      }
-    })
+        activityType: "New Task Added",
+      },
+    });
 
     // send email to user which is added to task
-    // await queue.add("send-task-email", {
-    //   email: userEmail,
-    //   text: `Hi ${req.user.name} , You have been assigned a new task with id : ${title} ,
-    //    please check your dashboard for more details`
-    // })
+    await queue.add("send-task-email", {
+      email: userEmail,
+      text: `Hi ${req.user.name} , You have been assigned a new task with id : ${title} ,
+       please check your dashboard for more details`,
+    });
 
     res.status(200).json({
       msg: "task Created successfully",
       data: task,
     });
-
   } catch (err) {
     console.log("Error in ceatingf task", err);
     throw new Error("Error in creating new task");
@@ -74,8 +76,8 @@ export const getAllTask = async (req, res) => {
     const task = await prisma.task.findMany({
       include: {
         assignedTo: true,
-        project: true
-      }
+        project: true,
+      },
     });
     res.status(200).json({
       message: "All task fetched successfully",
@@ -99,10 +101,10 @@ export const getTaskByID = async (req, res) => {
         assignedTo: {
           select: {
             name: true,
-          }
+          },
         },
-        project: true
-      }
+        project: true,
+      },
     });
     if (!task) {
       return res.status(404).json({
@@ -140,53 +142,56 @@ export const deleteTask = async (req, res) => {
 
 //update tasks status
 export const updateTaskStatus = async (req, res) => {
-  const id = req.params.id
-  const status = req.body.data
-  const username = req.user.name
-  console.log("from task controller")
+  const id = req.params.id;
+  const status = req.body.data;
+  const username = req.user.name;
+  console.log("from task controller");
 
-  io.to("ADMIN").emit("newActivity", { activityType: "Task Status Updated", description: `Task with id : ${id} has been updated by ${username} to ${status}`, createdAt: new Date() })
+  io.to("ADMIN").emit("newActivity", {
+    activityType: "Task Status Updated",
+    description: `Task with id : ${id} has been updated by ${username} to ${status}`,
+    createdAt: new Date(),
+  });
 
   const taskdata = await prisma.task.findUnique({
     where: {
-      id: id
-    }
-  })
+      id: id,
+    },
+  });
 
   if (!taskdata) {
     return res.status(404).json({
-      message: "task not found"
-    })
+      message: "task not found",
+    });
   }
 
   const tasks = await prisma.task.update({
     where: {
-      id: id
+      id: id,
     },
     data: {
-      taskStatus: status
-    }
-  })
+      taskStatus: status,
+    },
+  });
 
   const newActivity = await prisma.activity.create({
     data: {
       userid: "688f618c-5848-469e-b37e-23b745b5292a",
       description: `Task with id : ${id} has been updated by ${username} to ${status}`,
       createdAt: new Date(),
-      activityType: "Task Status Updated"
-    }
-  })
+      activityType: "Task Status Updated",
+    },
+  });
 
   res.status(200).json({
     message: "task status updated successfully",
-    data: tasks
-  })
-
-}
+    data: tasks,
+  });
+};
 
 export const getALLTaskByUserID = async (req, res) => {
-  const id = req.params.id
-  console.log("from task controller")
+  const id = req.params.id;
+  console.log("from task controller");
   const user = await prisma.user.findUnique({
     where: {
       id: id,
@@ -205,14 +210,14 @@ export const getALLTaskByUserID = async (req, res) => {
       },
     },
     include: {
-      project: true
+      project: true,
     },
   });
   res.status(200).json({
     message: "User task fetched successfully",
     data: task,
   });
-}
+};
 
 // add user to task
 export const addUserToTask = async (req, res) => {
@@ -244,13 +249,12 @@ export const addUserToTask = async (req, res) => {
       },
     });
 
-    console.log("user added to task")
+    console.log("user added to task");
     await queue.add("send-task-email", {
-      email: 'amitthakur10sep@gmail.com',
+      email: "amitthakur10sep@gmail.com",
       text: `Hi ${req.user.name} , You have been assigned a new task with id : ${taskId} ,
-       please check your dashboard for more details`
-    })
-
+       please check your dashboard for more details`,
+    });
 
     res.status(200).json({
       message: "User added to task successfully",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Plus,
@@ -9,8 +9,7 @@ import {
   Crown,
   Shield,
   Users,
-  Eye,
-  MessageCircleIcon,
+  
 } from "lucide-react";
 import SideBar from "../../sharedComponents/Admin/SideBar";
 import Header from "../../sharedComponents/Admin/Header";
@@ -47,7 +46,7 @@ const MembersPage = () => {
     }
   }, [selectedRole]);
 
-  const getRoleIcon = (role: string) => {
+  const getRoleIcon = (role: string = "") => {
     switch (role) {
       case "DEVELOPER":
         return <Crown className="w-4 h-4 text-amber-600" />;
@@ -163,7 +162,7 @@ const MembersPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {filteredUser?.map((member, index) => (
+                    {filteredUser?.map((member) => (
                       <tr
                         key={member.id}
                         className="hover:bg-gray-50 transition-colors"
@@ -171,7 +170,7 @@ const MembersPage = () => {
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
-                              <img src={member?.avatar} />
+                              <img src={member?.avatar || ""} />
                             </div>
                             <div>
                               <div className="font-medium text-gray-900">
@@ -201,14 +200,14 @@ const MembersPage = () => {
                         <td className="py-4 px-6">
                           <span
                             className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                              member?.status === "Active"
+                              (member as any)?.status === "Active"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-gray-100 text-gray-600"
                             }`}
                           >
                             <div
                               className={`w-2 h-2 rounded-full ${
-                                member.status === "Active" || null
+                                (member as any).status === "Active" || null
                                   ? "bg-green-500"
                                   : "bg-gray-400"
                               }`}
@@ -217,7 +216,7 @@ const MembersPage = () => {
                           </span>
                         </td>
                         <td className="py-4 px-6 text-sm text-gray-600">
-                          {member?.createdAt?.split("T")[0]}
+                          {typeof (member as any)?.createdAt === 'string' ? String((member as any)?.createdAt).split("T")[0] : ''}
                           {/* {new Date(member.joinedDate).toLocaleDateString()} */}
                         </td>
                         {/* <td className="py-4 px-6 text-right">
@@ -239,7 +238,7 @@ const MembersPage = () => {
 
             {/* Members Cards - Mobile & Tablet */}
             <div className="lg:hidden space-y-3 sm:space-y-4">
-              {filteredUser?.map((member, index) => (
+              {filteredUser?.map((member) => (
                 <div
                   key={member.id}
                   className="bg-white rounded-lg border border-gray-200 p-4"
@@ -279,14 +278,14 @@ const MembersPage = () => {
 
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-medium ${
-                        member.status === "Active"
+                        (member as any).status === "Active"
                           ? "bg-green-100 text-green-800"
                           : "bg-gray-100 text-gray-600"
                       }`}
                     >
                       <div
                         className={`w-2 h-2 rounded-full ${
-                          member.status === "Active" || null
+                          (member as any).status === "Active" || null
                             ? "bg-green-500"
                             : "bg-gray-400"
                         }`}

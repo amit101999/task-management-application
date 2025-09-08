@@ -1,13 +1,12 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-
 type taskType = {
   filterTasks: Task[];
   tasks: Task[];
   selectedTask: Task | null;
-}
+};
 
-const intialState : taskType = {
+const intialState: taskType = {
   filterTasks: [],
   tasks: [],
   selectedTask: null,
@@ -40,28 +39,39 @@ const taskSlice = createSlice({
         tasks?.taskStatus.includes(action.payload)
       );
     },
-    filterTaskByText : (state, action: PayloadAction<string>) => {
+    filterTaskByText: (state, action: PayloadAction<string>) => {
       state.filterTasks = state.tasks.filter((tasks) =>
         tasks?.title.toLowerCase().includes(action.payload)
       );
     },
-   updateTaskStatus: (state, action: PayloadAction<{ id: string; status: "OPEN" | "INPROGRESS" | "CLOSED" }>) => {
-     state.tasks = state.tasks.map((task) =>
-    task.id === action.payload.id
-      ? { ...task, taskStatus: action.payload.status }
-      : task
-  );
+    updateTaskStatus: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        status: "OPEN" | "INPROGRESS" | "CLOSED";
+      }>
+    ) => {
+      state.tasks = state.tasks.map((task) =>
+        task.id === action.payload.id
+          ? { ...task, taskStatus: action.payload.status }
+          : task
+      );
 
-  state.filterTasks = state.filterTasks.map((task) => {
-    if (task.id === action.payload.id) {
-      return { ...task, taskStatus: action.payload.status };
-    }
-    return task;
-  });
-  state.tasks = state.filterTasks
-},
+      state.filterTasks = state.filterTasks.map((task) => {
+        if (task.id === action.payload.id) {
+          return { ...task, taskStatus: action.payload.status };
+        }
+        return task;
+      });
+      state.tasks = state.filterTasks;
+    },
     clearFilter: (state) => {
       state.filterTasks = state.tasks;
+    },
+    logoutUserTask: (state) => {
+      state.filterTasks = [];
+      state.tasks = [];
+      state.selectedTask = null;
     },
   },
 });
@@ -73,7 +83,8 @@ export const {
   clearFilter,
   filterByName,
   filterByStatus,
-  updateTaskStatus ,
-  filterTaskByText
+  updateTaskStatus,
+  filterTaskByText,
+  logoutUserTask,
 } = taskSlice.actions;
 export default taskSlice.reducer;

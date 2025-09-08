@@ -91,7 +91,8 @@ useEffect(() => {
     }
   };
 
-  const isOverdue = (dueDate: string) => {
+  const isOverdue = (dueDate: string | undefined) => {
+    if(!dueDate) return false;
     return new Date(dueDate) < new Date();
   };
 
@@ -280,7 +281,7 @@ useEffect(() => {
                           <Calendar className="w-4 h-4" />
                         )}
                         <span>
-                          {new Date(task.dueDate).toLocaleDateString()}
+                          {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
                         </span>
                       </div>
                     </div>
@@ -357,7 +358,7 @@ useEffect(() => {
                             <Calendar className="w-4 h-4 flex-shrink-0" />
                           )}
                           <span>
-                            {new Date(task.dueDate).toLocaleDateString()}
+                            {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}
                           </span>
                         </div>
                       </div>
