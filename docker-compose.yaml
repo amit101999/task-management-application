@@ -23,10 +23,12 @@ services:
     container_name: redis-container
     ports:
       - "6379:6379"
-  # frontend-service:
-  #   build: ./task-management-application-frontend
-  #   container_name: frontend-container
-  #   ports:
-  #     - "4173:4173"
-  #   depends_on:
-  #     - backend-service
+  frontend-service:
+    build: ./task-management-application-frontend
+    container_name: frontend-container
+    ports:
+      - "4173:4173"
+    env_file:
+      - /home/ubuntu/backend.env
+    depends_on:
+      - backend-service
