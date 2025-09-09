@@ -53,14 +53,6 @@ const LoginPage: React.FC = () => {
         `${import.meta.env.VITE_BASE_URL}/api/user/login-with-google?code=${
           data.code
         }`,
-        {}, // empty body, since you only send query param
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              localStorage.getItem("token")
-            )}`,
-          },
-        }
       );
       const userData = res.data.user;
       // storing token in localstorage
