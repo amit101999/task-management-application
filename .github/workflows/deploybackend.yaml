@@ -16,18 +16,21 @@ jobs:
       - name: "Cloning the github repository"
         uses: actions/checkout@v2
 
-      - name: "Check disk usage before"
-        run: df -h
+      - name: "checking .."
+        run: docker run
 
-      - name: "Clean up Docker before build"
-        run: |
-          docker system prune -af --volumes
+      # - name: "Check disk usage before"
+      #   run: df -h
 
-      - name: "Run Docker Compose"
-        run: |
-          docker compose down
-          docker compose build --no-cache
-          docker compose up -d
+      # - name: "Clean up Docker before build"
+      #   run: |
+      #     docker system prune -af --volumes
 
-      - name: "Check disk usage after the deployment"
-        run: df -h
+      # - name: "Run Docker Compose"
+      #   run: |
+      #     docker compose down
+      #     docker compose build --no-cache
+      #     docker compose up -d
+
+      # - name: "Check disk usage after the deployment"
+      #   run: df -h
