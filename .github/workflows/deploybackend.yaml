@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: "checking .."
-        run: docker run
+        run: docker ps
 
       # - name: "Check disk usage before"
       #   run: df -h
