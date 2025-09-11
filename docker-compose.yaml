@@ -23,6 +23,7 @@ services:
     container_name: redis-container
     ports:
       - "6379:6379"
+
   frontend-service:
     build: ./task-management-application-frontend
     container_name: frontend-container
