@@ -31,3 +31,5 @@ jobs:
 
       - name: "Check disk usage after the deployment"
         run: df -h
+      - name: "backend deployment completed"
+        run: echo "backend deployed successfully"
