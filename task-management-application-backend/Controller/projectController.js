@@ -32,59 +32,148 @@ export const createProject = async (req, res) => {
 
 export const getAllProject = async (req, res) => {
   try {
-    const project = await prisma.project.findMany({
-      include: {
-        tasks: true,
-        users: true
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 20;
+    const status = req.query.status || '';
+    const search = req.query.search || '';
+    
+    const skip = (page - 1) * limit;
+    
+    // simple where clause
+    let whereClause = {};
+    if (status) {
+      whereClause.status = status;
+    }
+    if (search) {
+      whereClause.OR = [
+        { projectName: { contains: search } },
+        { description: { contains: search } }
+      ];
+    }
+
+    // get projects with only needed fields
+    const projects = await prisma.project.findMany({
+      where: whereClause,
+      skip: parseInt(skip),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        projectName: true,
+        description: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+        completedTask: true,
+        createdAt: true,
+        // get counts instead of full relations
+        _count: {
+          select: {
+            tasks: true,
+            users: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
-    })
+    });
+
+    // get total count
+    const totalCount = await prisma.project.count({ where: whereClause });
+
     res.status(200).json({
       message: "All project fetched successfully",
-      data: project
-    })
+      data: projects,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    });
   } catch (err) {
-    console.log(err)
-    throw new Error("Error in getting all project")
+    console.log(err);
+    res.status(500).json({ message: "Error in getting all project" });
   }
 };
 
 export const getProjectByID = async (req, res) => {
   try {
-    const id = req.params.id
+    const id = req.params.id;
 
     const project = await prisma.project.findUnique({
       where: {
         id: id
       },
-      include: {
+      select: {
+        id: true,
+        projectName: true,
+        description: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+        completedTask: true,
+        createdAt: true,
+        // get recent tasks with basic info
         tasks: {
-          include: {
+          select: {
+            id: true,
+            title: true,
+            taskStatus: true,
+            priority: true,
+            dueDate: true,
+            createdAt: true,
             assignedTo: {
-              select :{
-                name: true
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatar: true,
+                department: true
               }
             }
+          },
+          take: 10,
+          orderBy: {
+            createdAt: 'desc'
           }
         },
+        // get basic user info
         users: {
-          include :{
-            tasks: true
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            department: true,
+            role: true,
+            _count: {
+              select: {
+                tasks: true
+              }
+            }
+          },
+          take: 10,
+          orderBy: {
+            createdAt: 'desc'
           }
-        },
-      },
-    })
+        }
+      }
+    });
+    
     if (!project) {
       return res.status(404).json({
         message: "project not found"
-      })
+      });
     }
+    
     res.status(200).json({
       message: "project fetched successfully",
       data: project
-    })
+    });
   } catch (err) {
-    console.log(err)
-    throw new Error("Error in getting project by id")
+    console.log(err);
+    res.status(500).json({ message: "Error in getting project by id" });
   }
 };
 
@@ -156,39 +245,84 @@ export const addtaskToProject = async (req, res) => {
   }
 };
 
-export const getAllProjectByUser = async (req,res)=>{
-  const id = req.params.id
-
-  const user = await prisma.user.findUnique({
-    where: {
-      id: id,
-    },
-  });
-  if (!user) {
-    return res.status(404).json({ 
-      message: "User not found",
+export const getAllProjectByUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 20;
+    const status = req.query.status || '';
+    
+    const skip = (page - 1) * limit;
+    
+    // check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: id },
+      select: { id: true, name: true }
     });
-  }
+    
+    if (!user) {
+      return res.status(404).json({ 
+        message: "User not found",
+      });
+    }
 
-  const projects = await prisma.project.findMany({
-    where: {
-      users:{
+    // simple where clause
+    let whereClause = {
+      users: {
         some: {
           id: id
         }
       }
-    },
-    include: {
-      tasks: true,
-      users: true
+    };
+    
+    if (status) {
+      whereClause.status = status;
     }
-  });
-  res.status(200).json({
-    message: "User project fetched successfully",
-    data: projects
-  });
 
-} 
+    const projects = await prisma.project.findMany({
+      where: whereClause,
+      skip: parseInt(skip),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        projectName: true,
+        description: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+        completedTask: true,
+        createdAt: true,
+        // get counts instead of full relations
+        _count: {
+          select: {
+            tasks: true,
+            users: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // get total count
+    const totalCount = await prisma.project.count({ where: whereClause });
+
+    res.status(200).json({
+      message: "User project fetched successfully",
+      data: projects,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error in getting user projects" });
+  }
+}; 
 
 
 // delete task from project

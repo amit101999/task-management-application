@@ -70,22 +70,91 @@ export const createtask = async (req, res) => {
     throw new Error("Error in creating new task");
   }
 };
-// this will be chnage to get all task related to specific project
 export const getAllTask = async (req, res) => {
   try {
-    const task = await prisma.task.findMany({
-      include: {
-        assignedTo: true,
-        project: true,
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 20;
+    const status = req.query.status || '';
+    const projectId = req.query.projectId || '';
+    const assignedUserId = req.query.assignedUserId || '';
+    const search = req.query.search || '';
+    
+    const skip = (page - 1) * limit;
+    
+    // simple where clause
+    let whereClause = {};
+    if (status) {
+      whereClause.taskStatus = status;
+    }
+    if (projectId) {
+      whereClause.projectId = projectId;
+    }
+    if (assignedUserId) {
+      whereClause.userid = assignedUserId;
+    }
+    if (search) {
+      whereClause.OR = [
+        { title: { contains: search } },
+        { description: { contains: search } }
+      ];
+    }
+
+    // get tasks with only needed fields
+    const tasks = await prisma.task.findMany({
+      where: whereClause,
+      skip: parseInt(skip),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        taskStatus: true,
+        priority: true,
+        dueDate: true,
+        startDate: true,
+        createdAt: true,
+        // get basic user info
+        assignedTo: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            department: true
+          }
+        },
+        // get basic project info
+        project: {
+          select: {
+            id: true,
+            projectName: true,
+            status: true,
+            startDate: true,
+            endDate: true
+          }
+        }
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
+
+    // get total count
+    const totalCount = await prisma.task.count({ where: whereClause });
+
     res.status(200).json({
       message: "All task fetched successfully",
-      data: task,
+      data: tasks,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
     });
   } catch (err) {
     console.log(err);
-    throw new Error("Error in getting all task");
+    res.status(500).json({ message: "Error in getting all task" });
   }
 };
 
@@ -97,27 +166,53 @@ export const getTaskByID = async (req, res) => {
       where: {
         id: id,
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        taskStatus: true,
+        priority: true,
+        dueDate: true,
+        startDate: true,
+        createdAt: true,
+        // get basic user info
         assignedTo: {
           select: {
+            id: true,
             name: true,
-          },
+            email: true,
+            avatar: true,
+            department: true,
+            phone: true
+          }
         },
-        project: true,
-      },
+        // get basic project info
+        project: {
+          select: {
+            id: true,
+            projectName: true,
+            description: true,
+            status: true,
+            startDate: true,
+            endDate: true
+          }
+        }
+      }
     });
+    
     if (!task) {
       return res.status(404).json({
         message: "task not found",
       });
     }
+    
     res.status(200).json({
       message: "task fetched successfully",
       data: task,
     });
   } catch (err) {
     console.log(err);
-    throw new Error("Error in getting task by id");
+    res.status(500).json({ message: "Error in getting task by id" });
   }
 };
 
@@ -190,33 +285,81 @@ export const updateTaskStatus = async (req, res) => {
 };
 
 export const getALLTaskByUserID = async (req, res) => {
-  const id = req.params.id;
-  console.log("from task controller");
-  const user = await prisma.user.findUnique({
-    where: {
-      id: id,
-    },
-  });
-  if (!user) {
-    return res.status(404).json({
-      message: "task not found",
+  try {
+    const id = req.params.id;
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 20;
+    const status = req.query.status || '';
+    
+    const skip = (page - 1) * limit;
+    
+    // check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: id },
+      select: { id: true, name: true }
     });
-  }
+    
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
-  const task = await prisma.task.findMany({
-    where: {
-      assignedTo: {
-        id: id,
+    // simple where clause
+    let whereClause = {
+      userid: id
+    };
+    
+    if (status) {
+      whereClause.taskStatus = status;
+    }
+
+    const tasks = await prisma.task.findMany({
+      where: whereClause,
+      skip: parseInt(skip),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        taskStatus: true,
+        priority: true,
+        dueDate: true,
+        startDate: true,
+        createdAt: true,
+        // get basic project info
+        project: {
+          select: {
+            id: true,
+            projectName: true,
+            status: true,
+            startDate: true,
+            endDate: true
+          }
+        }
       },
-    },
-    include: {
-      project: true,
-    },
-  });
-  res.status(200).json({
-    message: "User task fetched successfully",
-    data: task,
-  });
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // get total count
+    const totalCount = await prisma.task.count({ where: whereClause });
+
+    res.status(200).json({
+      message: "User task fetched successfully",
+      data: tasks,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error in getting user tasks" });
+  }
 };
 
 // add user to task

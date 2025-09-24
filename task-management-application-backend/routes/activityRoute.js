@@ -1,10 +1,15 @@
 import express from "express";
-import { getActivityByUser } from "../Controller/ActivityController.js";
+import { getActivityByUser, getAllActivities, createActivity } from "../Controller/ActivityController.js";
 import { userAuth } from "../midleware/userAuth.js";
-
+import { checkAdmin } from "../midleware/checkAdmin.js";
 
 const route = express.Router();
 
-// addd middleware that only the admin can do this things also check it user is log in or not 
-route.get("/getActivity/:id", userAuth, getActivityByUser)
-export default route
+// admin only routes
+route.post("/createActivity", userAuth, checkAdmin, createActivity);
+
+// protected routes - need authentication
+route.get("/getActivity/:id", userAuth, getActivityByUser);
+route.get("/getAllActivities", userAuth, checkAdmin, getAllActivities);
+
+export default route;
