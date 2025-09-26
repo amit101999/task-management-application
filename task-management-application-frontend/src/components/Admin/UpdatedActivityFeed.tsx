@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UseFetchActivityByUserId, UseFetchAllActivities } from '../../hooks/hookActivity';
-import { filterActivitiesBySearch, filterActivitiesByType, filterActivitiesByUser, clearFilters } from '../../redux/activitySlice';
+import { filterActivitiesBySearch, filterActivitiesByType, clearFilters } from '../../redux/activitySlice';
 import type { RootState } from '../../redux/store';
-import { Search, Filter, Activity, User, Clock, Calendar, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { Search, Filter, Activity, User, Clock, Calendar, CheckCircle, PlusCircle, Edit, Trash2 } from 'lucide-react';
 
 interface UpdatedActivityFeedProps {
   userId?: string;
@@ -12,7 +12,7 @@ interface UpdatedActivityFeedProps {
 
 const UpdatedActivityFeed: React.FC<UpdatedActivityFeedProps> = ({ userId, isAdmin = false }) => {
   const dispatch = useDispatch();
-  const { filteredActivities, loading, error, pagination, searchQuery, activityTypeFilter, userFilter } = useSelector((state: RootState) => state.activities);
+  const { filteredActivities, loading, error, pagination } = useSelector((state: RootState) => state.activities);
   
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -38,11 +38,7 @@ const UpdatedActivityFeed: React.FC<UpdatedActivityFeedProps> = ({ userId, isAdm
     dispatch(filterActivitiesByType(value));
   };
 
-  // handle user filter
-  const handleUserFilter = (value: string) => {
-    setSelectedUserId(value);
-    dispatch(filterActivitiesByUser(value));
-  };
+  // handle user filter (removed unused function)
 
   // clear all filters
   const handleClearFilters = () => {

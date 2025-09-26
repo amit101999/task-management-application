@@ -45,7 +45,7 @@ export const UsefetchUserById = (userId: string | undefined) => {
       
       try {
         dispatch(setLoading(true));
-        const user = await axios.get(
+        await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/user/getUser/${userId}`,
           {
             headers: {
@@ -55,7 +55,6 @@ export const UsefetchUserById = (userId: string | undefined) => {
             },
           }
         );
-        const data = user.data.data;
         // you can add a setUser action if needed
         dispatch(setLoading(false));
       } catch (error) {

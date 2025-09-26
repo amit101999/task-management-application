@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UseFetchProject } from '../../hooks/hookProject';
 import { filterProjects, filterProjectsBySearch, clearFilters } from '../../redux/projectSlice';
 import type { RootState } from '../../redux/store';
-import { Search, Filter, FolderOpen, Users, CheckSquare, Calendar, Clock, AlertCircle, CheckCircle, Circle } from 'lucide-react';
+import { Search, Filter, FolderOpen, Users, CheckSquare, Calendar, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
 
 const UpdatedProjectsPage: React.FC = () => {
   const dispatch = useDispatch();
-  const { filteredProjects, loading, error, pagination, searchQuery, statusFilter } = useSelector((state: RootState) => state.projects);
+  const { filteredProjects, loading, error, pagination } = useSelector((state: RootState) => state.projects);
   
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -192,12 +192,12 @@ const UpdatedProjectsPage: React.FC = () => {
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-gray-600">
                     <Users className="w-4 h-4 mr-2" />
-                    <span>{project._count?.users || 0} members</span>
+                    <span>0 members</span>
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-600">
                     <CheckSquare className="w-4 h-4 mr-2" />
-                    <span>{project._count?.tasks || 0} tasks</span>
+                    <span>0 tasks</span>
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-600">
@@ -227,7 +227,7 @@ const UpdatedProjectsPage: React.FC = () => {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">
-                    Created: {new Date(project.createdAt).toLocaleDateString()}
+                    Project ID: {project.id}
                   </span>
                   
                   <div className="flex space-x-2">
