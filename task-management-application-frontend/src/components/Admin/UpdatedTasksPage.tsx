@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UsefetchTask } from '../../hooks/hookTask';
-import { filterTaskByText, filterByStatus, filterProjectByName, filterByName, clearFilter } from '../../redux/taskSlice';
+import { filterTaskByText, filterByStatus, filterProjectByName, clearFilter } from '../../redux/taskSlice';
 import type { RootState } from '../../redux/store';
-import { Search, Filter, CheckSquare, User, Calendar, Clock, AlertCircle, CheckCircle, Circle } from 'lucide-react';
+import { Search, Filter, CheckSquare, User, Calendar, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
 
 const UpdatedTasksPage: React.FC = () => {
   const dispatch = useDispatch();
-  const { filterTasks, loading, error, pagination, searchQuery, statusFilter, projectFilter, userFilter } = useSelector((state: RootState) => state.tasks);
+  const { filterTasks, loading, error, pagination } = useSelector((state: RootState) => state.tasks);
   
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -36,11 +36,7 @@ const UpdatedTasksPage: React.FC = () => {
     dispatch(filterProjectByName(value));
   };
 
-  // handle user filter
-  const handleUserFilter = (value: string) => {
-    setAssignedUserId(value);
-    dispatch(filterByName(value));
-  };
+  // handle user filter (removed unused function)
 
   // clear all filters
   const handleClearFilters = () => {
@@ -227,13 +223,13 @@ const UpdatedTasksPage: React.FC = () => {
                   
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="w-4 h-4 mr-2" />
-                    <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                    <span>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">
-                    Created: {new Date(task.createdAt).toLocaleDateString()}
+                    Task ID: {task.id}
                   </span>
                   
                   <div className="flex space-x-2">

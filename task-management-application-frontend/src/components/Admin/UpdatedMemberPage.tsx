@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UsefetchUsers } from '../../hooks/hookUsers';
 import { filterUser, filterUserByDepartment, clearFilter } from '../../redux/userSlice';
@@ -7,7 +7,7 @@ import { Search, Filter, Users, Mail, Phone, Calendar, Building } from 'lucide-r
 
 const UpdatedMemberPage: React.FC = () => {
   const dispatch = useDispatch();
-  const { filteredUser, loading, error, pagination, searchQuery, departmentFilter } = useSelector((state: RootState) => state.user);
+  const { filteredUser, loading, error, pagination } = useSelector((state: RootState) => state.user);
   
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -179,14 +179,14 @@ const UpdatedMemberPage: React.FC = () => {
                       
                       <div className="flex items-center text-sm text-gray-600">
                         <Calendar className="w-4 h-4 mr-2" />
-                        <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                        <span>Joined {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
                       </div>
                     </div>
                     
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex space-x-4 text-sm text-gray-500">
-                        <span>{user._count?.tasks || 0} Tasks</span>
-                        <span>{user._count?.projects || 0} Projects</span>
+                        <span>Tasks: 0</span>
+                        <span>Projects: 0</span>
                       </div>
                       
                       {user.lastLogin && (
