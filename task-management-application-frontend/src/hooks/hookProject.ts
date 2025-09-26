@@ -1,48 +1,70 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { getAllProject } from "../redux/projectSlice";
+import { getAllProject, setLoading, setError } from "../redux/projectSlice";
 import axios from "axios";
 
-export const UseFetchProject = () => {
+// simple hook to fetch all projects with pagination and filters
+export const UseFetchProject = (page = 1, limit = 20, status = '', search = '') => {
   const dispatch = useDispatch();
+  
   useEffect(() => {
-    const fetechProjects = async () => {
-      const res = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/project/getAllProject`,
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              localStorage.getItem("token") || ""
-            )}`,
-          },
-        }
-      );
-      const data = res.data.data;
-      console.log(data);
-      dispatch(getAllProject(data));
+    const fetchProjects = async () => {
+      try {
+        dispatch(setLoading(true));
+        const res = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/project/getAllProject`,
+          {
+            params: { page, limit, status, search },
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                localStorage.getItem("token") || ""
+              )}`,
+            },
+          }
+        );
+        const data = res.data;
+        dispatch(getAllProject(data));
+        dispatch(setLoading(false));
+      } catch (error) {
+        console.log("Error fetching projects:", error);
+        dispatch(setError("Failed to fetch projects"));
+        dispatch(setLoading(false));
+      }
     };
-    fetechProjects();
-  }, []);
+    fetchProjects();
+  }, [dispatch, page, limit, status, search]);
 };
 
-export const UseFetchProjectByUserId = (id: string | undefined) => {
+// simple hook to fetch projects by user id
+export const UseFetchProjectByUserId = (id: string | undefined, page = 1, limit = 20, status = '') => {
   const dispatch = useDispatch();
+  
   useEffect(() => {
-    const fetechProjects = async () => {
+    const fetchProjects = async () => {
       if (!id) return;
-      const res = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/project/user/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              localStorage.getItem("token") || ""
-            )}`,
-          },
-        }
-      );
-      const data = res.data.data;
-      dispatch(getAllProject(data));
+      
+      try {
+        dispatch(setLoading(true));
+        const res = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/project/user/${id}`,
+          {
+            params: { page, limit, status },
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                localStorage.getItem("token") || ""
+              )}`,
+            },
+          }
+        );
+        const data = res.data;
+        dispatch(getAllProject(data));
+        dispatch(setLoading(false));
+      } catch (error) {
+        console.log("Error fetching user projects:", error);
+        dispatch(setError("Failed to fetch user projects"));
+        dispatch(setLoading(false));
+      }
     };
-    fetechProjects();
-  }, [id]);
+    fetchProjects();
+  }, [dispatch, id, page, limit, status]);
 };

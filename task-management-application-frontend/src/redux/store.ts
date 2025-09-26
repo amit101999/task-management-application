@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import userSlice from "./userSlice.ts"
 import  projectSlice  from "./projectSlice.ts"
 import  taskSlice  from "./taskSlice.ts"
+import activitySlice from "./activitySlice.ts"
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
@@ -14,7 +15,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
       user : userSlice , 
         projects : projectSlice,
-        tasks : taskSlice
+        tasks : taskSlice,
+        activities : activitySlice
 })
 
 const persistantReducer = persistReducer(persistConfig , rootReducer)
@@ -30,7 +32,8 @@ export const persistor = persistStore(store);
 //     reducer: {
 //         user : userSlice , 
 //         projects : projectSlice,
-//         tasks : taskSlice
+//         tasks : taskSlice,
+//         activities : activitySlice
 //     },
 // })
 

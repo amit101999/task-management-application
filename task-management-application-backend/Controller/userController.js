@@ -55,27 +55,23 @@ export const userLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // get user without all the relations first
     const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
-      include: {
-        tasks: {
-          include: {
-            project: {
-              select: {
-                projectName: true,
-              },
-            },
-          },
-        },
-        projects: {
-          include: {
-            tasks: true,
-          },
-        },
-      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        role: true,
+        avatar: true,
+        department: true,
+        lastLogin: true
+      }
     });
+    
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -89,7 +85,24 @@ export const userLogin = async (req, res) => {
       });
     }
 
-    // creating jsonwebtoken
+    // update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLogin: new Date() }
+    });
+
+    // remove password from response
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      department: user.department,
+      lastLogin: user.lastLogin
+    };
+
+    // create token
     const token = jwt.sign(
       { data: { id: user.id, role: user.role, name: user.name } },
       process.env.JWT_SCREET_KEY,
@@ -98,23 +111,14 @@ export const userLogin = async (req, res) => {
       }
     );
 
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    //   sameSite: "none", // required for cross-origin
-    //   secure: false, // because your EC2 is running on plain HTTP
-    //   maxAge: 24 * 60 * 60 * 1000,
-    // });
-
-    // using localstorage instead of cookies for storing token
-
     res.status(200).json({
       message: "User logged in successfully",
-      data: user,
+      data: userData,
       token: token,
     });
   } catch (err) {
     console.log(err);
-    throw new Error("Error in login user");
+    res.status(500).json({ message: "Error in login user" });
   }
 };
 
@@ -136,19 +140,68 @@ export const userLogout = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 20;
+    const search = req.query.search || '';
+    const department = req.query.department || '';
+    
+    const skip = (page - 1) * limit;
+    
+    // simple where clause
+    let whereClause = {};
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: search } },
+        { email: { contains: search } }
+      ];
+    }
+    if (department) {
+      whereClause.department = department;
+    }
+
+    // get users with only needed fields
     const users = await prisma.user.findMany({
-      include: {
-        tasks: true,
-        projects: true,
+      where: whereClause,
+      skip: parseInt(skip),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatar: true,
+        phone: true,
+        department: true,
+        createdAt: true,
+        lastLogin: true,
+        _count: {
+          select: {
+            tasks: true,
+            projects: true
+          }
+        }
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
+
+    // get total count
+    const totalCount = await prisma.user.count({ where: whereClause });
+
     res.status(200).json({
       message: "All users fetched successfully",
       data: users,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
     });
   } catch (err) {
     console.log(err);
-    throw new Error("Error in getting all users");
+    res.status(500).json({ message: "Error in getting all users" });
   }
 };
 
@@ -160,22 +213,70 @@ export const getUserByID = async (req, res) => {
       where: {
         id,
       },
-      include: {
-        tasks: true,
-        projects: true,
-      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatar: true,
+        phone: true,
+        department: true,
+        createdAt: true,
+        lastLogin: true,
+        // get only recent tasks with basic info
+        tasks: {
+          select: {
+            id: true,
+            title: true,
+            taskStatus: true,
+            dueDate: true,
+            priority: true,
+            project: {
+              select: {
+                id: true,
+                projectName: true
+              }
+            }
+          },
+          take: 10,
+          orderBy: {
+            createdAt: 'desc'
+          }
+        },
+        // get only recent projects with basic info
+        projects: {
+          select: {
+            id: true,
+            projectName: true,
+            status: true,
+            startDate: true,
+            endDate: true,
+            _count: {
+              select: {
+                tasks: true
+              }
+            }
+          },
+          take: 10,
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      }
     });
+    
     if (!user) {
       return res.status(404).json({
         message: "User not found",
       });
     }
+    
     res.status(200).json({
       message: "User fetched successfully",
       data: user,
     });
   } catch (err) {
     console.log(err);
-    throw new Error("Error in getting user by id");
+    res.status(500).json({ message: "Error in getting user by id" });
   }
 };
