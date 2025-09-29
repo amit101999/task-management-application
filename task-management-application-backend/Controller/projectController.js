@@ -64,7 +64,6 @@ export const getAllProject = async (req, res) => {
         startDate: true,
         endDate: true,
         completedTask: true,
-        createdAt: true,
         // get counts instead of full relations
         _count: {
           select: {
@@ -74,7 +73,7 @@ export const getAllProject = async (req, res) => {
         }
       },
       orderBy: {
-        createdAt: 'desc'
+        startDate: 'desc'
       }
     });
 
@@ -113,7 +112,6 @@ export const getProjectByID = async (req, res) => {
         startDate: true,
         endDate: true,
         completedTask: true,
-        createdAt: true,
         // get recent tasks with basic info
         tasks: {
           select: {
@@ -122,7 +120,7 @@ export const getProjectByID = async (req, res) => {
             taskStatus: true,
             priority: true,
             dueDate: true,
-            createdAt: true,
+            startDate: true,
             assignedTo: {
               select: {
                 id: true,
@@ -135,7 +133,7 @@ export const getProjectByID = async (req, res) => {
           },
           take: 10,
           orderBy: {
-            createdAt: 'desc'
+            startDate: 'desc'
           }
         },
         // get basic user info
@@ -155,7 +153,7 @@ export const getProjectByID = async (req, res) => {
           },
           take: 10,
           orderBy: {
-            createdAt: 'desc'
+            name: 'asc'
           }
         }
       }
@@ -291,7 +289,6 @@ export const getAllProjectByUser = async (req, res) => {
         startDate: true,
         endDate: true,
         completedTask: true,
-        createdAt: true,
         // get counts instead of full relations
         _count: {
           select: {
@@ -301,7 +298,7 @@ export const getAllProjectByUser = async (req, res) => {
         }
       },
       orderBy: {
-        createdAt: 'desc'
+        startDate: 'desc'
       }
     });
 

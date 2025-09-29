@@ -27,16 +27,7 @@ export const getActivityByUser = async (req, res) => {
         description: true,
         activityType: true,
         createdAt: true,
-        // get basic user info
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            department: true
-          }
-        }
+        userid: true
       },
       orderBy: {
         createdAt: 'desc'
@@ -100,16 +91,7 @@ export const getAllActivities = async (req, res) => {
         description: true,
         activityType: true,
         createdAt: true,
-        // get basic user info
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            department: true
-          }
-        }
+        userid: true
       },
       orderBy: {
         createdAt: 'desc'
@@ -151,15 +133,7 @@ export const createActivity = async (req, res) => {
         description: true,
         activityType: true,
         createdAt: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            department: true
-          }
-        }
+        userid: true
       }
     });
 

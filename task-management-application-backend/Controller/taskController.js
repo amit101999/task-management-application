@@ -112,7 +112,6 @@ export const getAllTask = async (req, res) => {
         priority: true,
         dueDate: true,
         startDate: true,
-        createdAt: true,
         // get basic user info
         assignedTo: {
           select: {
@@ -135,7 +134,7 @@ export const getAllTask = async (req, res) => {
         }
       },
       orderBy: {
-        createdAt: 'desc'
+        startDate: 'desc'
       }
     });
 
@@ -174,7 +173,6 @@ export const getTaskByID = async (req, res) => {
         priority: true,
         dueDate: true,
         startDate: true,
-        createdAt: true,
         // get basic user info
         assignedTo: {
           select: {
@@ -326,7 +324,6 @@ export const getALLTaskByUserID = async (req, res) => {
         priority: true,
         dueDate: true,
         startDate: true,
-        createdAt: true,
         // get basic project info
         project: {
           select: {
@@ -339,7 +336,7 @@ export const getALLTaskByUserID = async (req, res) => {
         }
       },
       orderBy: {
-        createdAt: 'desc'
+        startDate: 'desc'
       }
     });
 
