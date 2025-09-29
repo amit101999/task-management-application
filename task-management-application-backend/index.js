@@ -16,7 +16,10 @@ const app = express();
 const server = createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: "https://task-management-application-opal.vercel.app",
+    origin: [
+      "https://task-management-application-opal.vercel.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
   },
 });
@@ -41,7 +44,10 @@ io.on("connection", (socket) => {
 
 app.use(
   cors({
-    origin: "https://task-management-application-opal.vercel.app",
+    origin: [
+      "https://task-management-application-opal.vercel.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
   })
 );
