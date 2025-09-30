@@ -131,9 +131,9 @@ export const getProjectByID = async (req, res) => {
               }
             }
           },
-          take: 10,
+          take: 50,
           orderBy: {
-            startDate: 'desc'
+            id: 'desc'
           }
         },
         // get basic user info

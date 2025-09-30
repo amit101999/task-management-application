@@ -152,7 +152,7 @@ const ProjectsPage = () => {
                     <div className="col-span-2  justify-center flex">
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <Users className="w-4 h-4" />
-                        <span>{project.users?.length} members</span>
+                        <span>{project._count?.users || 0} members</span>
                       </div>
                     </div>
 
@@ -207,7 +207,7 @@ const ProjectsPage = () => {
                       </div>
                       <div className="flex items-center space-x-2 text-gray-600">
                         <Users className="w-4 h-4 flex-shrink-0" />
-                        <span>{project.users?.length} members</span>
+                        <span>{project._count?.users || 0} members</span>
                       </div>
                     </div>
 

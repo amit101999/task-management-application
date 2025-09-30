@@ -1,21 +1,63 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Calendar, ChevronRight, Target, ArrowLeft } from 'lucide-react';
 import Header from '../../sharedComponents/Member/Header';
 import Sidebar from '../../sharedComponents/Member/Sidebar';
 import ProjectTask from '../../sharedComponents/Member/Project';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../redux/store';
+import axios from 'axios';
 
 const MemberProjects = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
+  const [projectProgress, setProjectProgress] = useState<Record<string, number>>({});
 
   const { user } = useSelector((store: RootState) => store.user)
   const { filteredProjects } = useSelector((store: RootState) => store.projects);
-  // const tasks = user?.tasks
 
-  const returnClosedTask = (project: ProjectType) => {
-    const closedTask = project?.tasks?.filter((item) => item.taskStatus === "CLOSED")
-    return closedTask ?? []
+  // Fetch progress for each project
+  useEffect(() => {
+    const fetchProjectProgress = async () => {
+      if (!filteredProjects || !user?.id) return;
+      
+      const progressData: Record<string, number> = {};
+      
+      for (const project of filteredProjects) {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${project.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(
+                  localStorage.getItem("token") || ""
+                )}`,
+              },
+            }
+          );
+          
+          const tasks = res.data.data.tasks.filter(
+            (item: any) => item.assignedTo?.id === user.id
+          );
+          
+          const closedTasks = tasks.filter(
+            (item: any) => item.taskStatus === "CLOSED"
+          );
+          
+          const progress = tasks.length ? (closedTasks.length / tasks.length) * 100 : 0;
+          progressData[project.id] = progress;
+        } catch (error) {
+          console.error(`Error fetching progress for project ${project.id}:`, error);
+          progressData[project.id] = 0;
+        }
+      }
+      
+      setProjectProgress(progressData);
+    };
+
+    fetchProjectProgress();
+  }, [filteredProjects, user?.id]);
+
+  const getProjectProgress = (projectId: string) => {
+    return projectProgress[projectId] || 0;
   }
 
   // const getProjectTasks = (projectId: string) => {
@@ -91,7 +133,7 @@ const MemberProjects = () => {
 
                             <div className="flex items-center text-xs sm:text-sm text-gray-600">
                               <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                              <span className="whitespace-nowrap">{returnClosedTask(project).length}/{project?.tasks?.length ?? 0} Task</span>
+                              <span className="whitespace-nowrap">{project?._count?.tasks ?? 0} Task</span>
                             </div>
                           </div>
                         </div>
@@ -100,12 +142,12 @@ const MemberProjects = () => {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs sm:text-sm">
                           <span className="text-gray-600">Progress</span>
-                          <span className="font-medium text-gray-800">{Math.round((returnClosedTask(project).length / (project?.tasks?.length || 1)) * 100) || 0}%</span>
+                          <span className="font-medium text-gray-800">{getProjectProgress(project.id).toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${Math.round((returnClosedTask(project).length / (project?.tasks?.length || 1)) * 100) || 0}%` }}
+                            style={{ width: `${getProjectProgress(project.id)}%` }}
                           ></div>
                         </div>
                       </div>

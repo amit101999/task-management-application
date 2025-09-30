@@ -194,7 +194,7 @@ const MembersPage = () => {
                         </td>
                         <td className="py-4 px-6">
                           <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                            {member?.tasks.length} tasks
+                            {member?._count?.tasks || 0} tasks
                           </button>
                         </td>
                         <td className="py-4 px-6">
@@ -273,7 +273,7 @@ const MembersPage = () => {
                     </div>
 
                     <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                      {member?.tasks.length} tasks
+                      {member?._count?.tasks || 0} tasks
                     </button>
 
                     <span

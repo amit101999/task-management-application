@@ -17,12 +17,8 @@ interface PropType {
 }
 
 const ProjectTask = ({ selectedProject, userId }: PropType) => {
-  const closedTask = selectedProject.tasks?.filter(
-    (item) => item.taskStatus === "CLOSED"
-  );
-  const progress = (closedTask.length / selectedProject.tasks?.length) * 100;
-
   const [tasks, setTasks] = useState<Task[]>();
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     setTasks(selectedProject?.tasks);
@@ -36,14 +32,28 @@ const ProjectTask = ({ selectedProject, userId }: PropType) => {
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${
             selectedProject.id
-          }`
+          }`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                localStorage.getItem("token") || ""
+              )}`,
+            },
+          }
         );
 
         // console.log("hello",res.data.data.tasks)
         const data = res.data.data.tasks.filter(
-          (item: any) => item.userid === userId
+          (item: any) => item.assignedTo?.id === userId
         );
         setTasks(data);
+        
+        // Calculate progress based on filtered tasks
+        const closedTask = data.filter(
+          (item: any) => item.taskStatus === "CLOSED"
+        );
+        const calculatedProgress = data.length ? (closedTask.length / data.length) * 100 : 0;
+        setProgress(calculatedProgress);
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
@@ -132,11 +142,20 @@ const ProjectTask = ({ selectedProject, userId }: PropType) => {
                 Progress
               </p>
               <p className="text-base sm:text-lg font-bold text-gray-800">
-                {progress.toFixed(2)}
+                {progress.toFixed(2)}%
               </p>
             </div>
             <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full flex-shrink-0">
               <Target className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
+            </div>
+          </div>
+          {/* Progress Bar */}
+          <div className="mt-2">
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300 ease-in-out"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
         </div>
@@ -146,7 +165,7 @@ const ProjectTask = ({ selectedProject, userId }: PropType) => {
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm text-gray-600 truncate">Tasks</p>
               <p className="text-base sm:text-lg font-bold text-gray-800">
-                {selectedProject.tasks.length}
+                {tasks?.length || 0}
               </p>
             </div>
             <div className="p-1.5 sm:p-2 bg-green-100 rounded-full flex-shrink-0">

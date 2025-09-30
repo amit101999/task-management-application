@@ -51,8 +51,12 @@ interface UserType {
   role: string,
   email: string
   password?: string,
-  tasks: Task[],
-  projects: ProjectType[]
+  tasks?: Task[],
+  projects?: ProjectType[],
+  _count?: {
+    tasks: number,
+    projects: number
+  },
   phone?: number
   lastLogin?: Date
   department?: string
@@ -67,8 +71,12 @@ interface ProjectType {
   startDate: string;
   status: 'ACTIVE' | 'COMPLETED' | 'UPCOMING'
   endDate: string;
-  users: UserType[];
-  tasks: Task[];
+  users?: UserType[];
+  tasks?: Task[];
+  _count?: {
+    users: number;
+    tasks: number;
+  };
 }
 
 interface Task {
