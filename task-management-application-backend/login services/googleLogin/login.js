@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const oauth2Client = new google.auth.OAuth2(
   process.env.LOGIN_OAUTH_ID,
   process.env.LOGIN_OAUTH_SCERET_KEY,
-  "http://localhost:5173"
+  "https://task-management-application-opal.vercel.app"
 );
 
 export const googleLogin = async (req, res) => {
