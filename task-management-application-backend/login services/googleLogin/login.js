@@ -61,6 +61,6 @@ export const googleLogin = async (req, res) => {
       .json({ message: "Google Login Success", user: newUser, token: token });
   } catch (err) {
     console.log("errro in google login ", err);
-    res.status(500).json({ message: "Error in google login" });
+    res.status(500).json({ message: "Error in google login : " + err.message });
   }
 };
