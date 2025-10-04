@@ -75,7 +75,10 @@ const LoginPage: React.FC = () => {
   };
 
   // reusable login function
-  const performLogin = async (credentials: { email: string; password: string }) => {
+  const performLogin = async (credentials: {
+    email: string;
+    password: string;
+  }) => {
     setLoader(true);
     try {
       const res = await axios.post(
@@ -112,7 +115,7 @@ const LoginPage: React.FC = () => {
   };
 
   const quickAdminSignIn = async () => {
-    const adminCreds = { email: "sakshi@gmail.com", password: "sakshi" };
+    const adminCreds = { email: "admin@gmail.com", password: "root" };
     setUserState(adminCreds);
     // Do not auto-submit; user will click Sign In
   };
