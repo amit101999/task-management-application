@@ -52,8 +52,11 @@ const LoginPage: React.FC = () => {
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/api/user/login-with-google?code=${
           data.code
-        }`,
+        }`
       );
+
+      console.log(res);
+
       const userData = res.data.user;
       // storing token in localstorage
       localStorage.setItem("token", JSON.stringify(res.data.token));
@@ -71,13 +74,13 @@ const LoginPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // reusable login function
+  const performLogin = async (credentials: { email: string; password: string }) => {
     setLoader(true);
-    e.preventDefault();
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/api/user/login`,
-        userState
+        credentials
       );
       const data = res.data.data;
       // storing token in localstorage
@@ -101,6 +104,17 @@ const LoginPage: React.FC = () => {
       toast.error("Wrong credentials");
       console.log(err);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await performLogin(userState);
+  };
+
+  const quickAdminSignIn = async () => {
+    const adminCreds = { email: "sakshi@gmail.com", password: "sakshi" };
+    setUserState(adminCreds);
+    // Do not auto-submit; user will click Sign In
   };
 
   return (
@@ -181,6 +195,17 @@ const LoginPage: React.FC = () => {
               )}
             </Button>
 
+            {/* Quick Admin Sign In Link */}
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={quickAdminSignIn}
+                className="text-xs sm:text-sm text-blue-600 hover:text-blue-500 font-medium "
+              >
+                Sign in as Admin
+              </button>
+            </div>
+
             {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -206,7 +231,7 @@ const LoginPage: React.FC = () => {
           </Button>
 
           {/* Sign Up Link */}
-          <div className="mt-6 sm:mt-8 text-center">
+          <div className="mt-2 sm:mt-2 text-center">
             <p className="text-xs sm:text-sm text-gray-600">
               Don't have an account?{" "}
               <Link to="/signup">

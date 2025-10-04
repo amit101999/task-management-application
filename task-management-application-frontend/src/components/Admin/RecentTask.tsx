@@ -54,8 +54,9 @@ const ActivityFeed = () => {
   useEffect(() => {
     const fetchActivity = async () => {
       const res = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/activity/getActivity/${user?.id}`,
+        `${import.meta.env.VITE_BASE_URL}/api/activity/getAllActivities`,
         {
+          params: { page: 1, limit: 20 },
           headers: {
             Authorization: `Bearer ${JSON.parse(
               localStorage.getItem("token") || ""
@@ -63,18 +64,15 @@ const ActivityFeed = () => {
           },
         }
       );
-      console.log("asdas : ", res.data.data);
       const data = res.data.data;
       setActivities(data);
     };
     fetchActivity();
   }, [user?.id, dispatch]);
-  console.log(activities);
 
   useEffect(() => {
     // Listen for real-time activity updates
     socket.on("newActivity", (data: Activity) => {
-      console.log("New activity received: ", data);
       setActivities((prev) => [data, ...prev]);
     });
 
