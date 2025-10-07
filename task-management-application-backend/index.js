@@ -20,6 +20,7 @@ export const io = new Server(server, {
       "https://task-management-application-opal.vercel.app",
       "http://localhost:5173",
     ],
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });
@@ -51,6 +52,7 @@ app.use(
     credentials: true,
   })
 );
+app.options("*", cors());
 
 app.use(cookieParser());
 
