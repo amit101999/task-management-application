@@ -2,6 +2,23 @@ import prisma from "../config/prisma.config.js";
 import { io } from "../index.js";
 import { queue } from "../queue/emailQueue.js";
 
+export const getTotaltaskCount = async (req, res) => {
+  const count = await prisma.task.count();
+  res.status(200).json({ totalTaskCount: count });
+};
+
+export const getAllTaskCountByStatus = async (req, res) => {
+  const count = await prisma.task.groupBy({
+    by: ["taskStatus"],
+    _count: true,
+  });
+
+  return res.status(200).json({
+    message: "Task count by status fetched successfully",
+    data: count,
+  });
+};
+
 export const createtask = async (req, res) => {
   const { title, description, dueDate, projectName, assignedUser, userEmail } =
     req.body;
@@ -74,13 +91,13 @@ export const getAllTask = async (req, res) => {
   try {
     const page = req.query.page || 1;
     const limit = req.query.limit || 20;
-    const status = req.query.status || '';
-    const projectId = req.query.projectId || '';
-    const assignedUserId = req.query.assignedUserId || '';
-    const search = req.query.search || '';
-    
+    const status = req.query.status || "";
+    const projectId = req.query.projectId || "";
+    const assignedUserId = req.query.assignedUserId || "";
+    const search = req.query.search || "";
+
     const skip = (page - 1) * limit;
-    
+
     // simple where clause
     let whereClause = {};
     if (status) {
@@ -95,7 +112,7 @@ export const getAllTask = async (req, res) => {
     if (search) {
       whereClause.OR = [
         { title: { contains: search } },
-        { description: { contains: search } }
+        { description: { contains: search } },
       ];
     }
 
@@ -119,8 +136,8 @@ export const getAllTask = async (req, res) => {
             name: true,
             email: true,
             avatar: true,
-            department: true
-          }
+            department: true,
+          },
         },
         // get basic project info
         project: {
@@ -129,13 +146,13 @@ export const getAllTask = async (req, res) => {
             projectName: true,
             status: true,
             startDate: true,
-            endDate: true
-          }
-        }
+            endDate: true,
+          },
+        },
       },
       orderBy: {
-        startDate: 'desc'
-      }
+        startDate: "desc",
+      },
     });
 
     // get total count
@@ -148,8 +165,8 @@ export const getAllTask = async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (err) {
     console.log(err);
@@ -181,8 +198,8 @@ export const getTaskByID = async (req, res) => {
             email: true,
             avatar: true,
             department: true,
-            phone: true
-          }
+            phone: true,
+          },
         },
         // get basic project info
         project: {
@@ -192,18 +209,18 @@ export const getTaskByID = async (req, res) => {
             description: true,
             status: true,
             startDate: true,
-            endDate: true
-          }
-        }
-      }
+            endDate: true,
+          },
+        },
+      },
     });
-    
+
     if (!task) {
       return res.status(404).json({
         message: "task not found",
       });
     }
-    
+
     res.status(200).json({
       message: "task fetched successfully",
       data: task,
@@ -287,16 +304,16 @@ export const getALLTaskByUserID = async (req, res) => {
     const id = req.params.id;
     const page = req.query.page || 1;
     const limit = req.query.limit || 20;
-    const status = req.query.status || '';
-    
+    const status = req.query.status || "";
+
     const skip = (page - 1) * limit;
-    
+
     // check if user exists
     const user = await prisma.user.findUnique({
       where: { id: id },
-      select: { id: true, name: true }
+      select: { id: true, name: true },
     });
-    
+
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -305,9 +322,9 @@ export const getALLTaskByUserID = async (req, res) => {
 
     // simple where clause
     let whereClause = {
-      userid: id
+      userid: id,
     };
-    
+
     if (status) {
       whereClause.taskStatus = status;
     }
@@ -331,13 +348,13 @@ export const getALLTaskByUserID = async (req, res) => {
             projectName: true,
             status: true,
             startDate: true,
-            endDate: true
-          }
-        }
+            endDate: true,
+          },
+        },
       },
       orderBy: {
-        startDate: 'desc'
-      }
+        startDate: "desc",
+      },
     });
 
     // get total count
@@ -350,8 +367,8 @@ export const getALLTaskByUserID = async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (err) {
     console.log(err);

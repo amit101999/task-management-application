@@ -63,15 +63,12 @@ export const userLogin = async (req, res) => {
       select: {
         id: true,
         name: true,
-        email: true,
         password: true,
         role: true,
         avatar: true,
-        department: true,
-        lastLogin: true
-      }
+      },
     });
-    
+
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -86,20 +83,17 @@ export const userLogin = async (req, res) => {
     }
 
     // update last login
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLogin: new Date() }
-    });
+    // await prisma.user.update({
+    //   where: { id: user.id },
+    //   data: { lastLogin: new Date() },
+    // });
 
     // remove password from response
     const userData = {
-      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
       avatar: user.avatar,
-      department: user.department,
-      lastLogin: user.lastLogin
     };
 
     // create token
@@ -142,17 +136,17 @@ export const getAllUsers = async (req, res) => {
   try {
     const page = req.query.page || 1;
     const limit = req.query.limit || 20;
-    const search = req.query.search || '';
-    const department = req.query.department || '';
-    
+    const search = req.query.search || "";
+    const department = req.query.department || "";
+
     const skip = (page - 1) * limit;
-    
+
     // simple where clause
     let whereClause = {};
     if (search) {
       whereClause.OR = [
         { name: { contains: search } },
-        { email: { contains: search } }
+        { email: { contains: search } },
       ];
     }
     if (department) {
@@ -177,13 +171,13 @@ export const getAllUsers = async (req, res) => {
         _count: {
           select: {
             tasks: true,
-            projects: true
-          }
-        }
+            projects: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     // get total count
@@ -196,8 +190,8 @@ export const getAllUsers = async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (err) {
     console.log(err);
@@ -234,14 +228,14 @@ export const getUserByID = async (req, res) => {
             project: {
               select: {
                 id: true,
-                projectName: true
-              }
-            }
+                projectName: true,
+              },
+            },
           },
           take: 10,
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: "desc",
+          },
         },
         // get only recent projects with basic info
         projects: {
@@ -253,24 +247,24 @@ export const getUserByID = async (req, res) => {
             endDate: true,
             _count: {
               select: {
-                tasks: true
-              }
-            }
+                tasks: true,
+              },
+            },
           },
           take: 10,
           orderBy: {
-            createdAt: 'desc'
-          }
-        }
-      }
+            createdAt: "desc",
+          },
+        },
+      },
     });
-    
+
     if (!user) {
       return res.status(404).json({
         message: "User not found",
       });
     }
-    
+
     res.status(200).json({
       message: "User fetched successfully",
       data: user,

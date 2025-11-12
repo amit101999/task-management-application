@@ -1,44 +1,65 @@
 import prisma from "../config/prisma.config.js";
+import redis from "../config/redis.js";
 
 export const createProject = async (req, res) => {
   let { projectName, description, startDate, endDate } = req.body;
   const currentDate = new Date();
-  let Status = "ACTIVE"
+  let Status = "ACTIVE";
   if (startDate > currentDate.toLocaleDateString("en-CA")) {
-    Status = "UPCOMING"
-    console.log(Status)
+    Status = "UPCOMING";
+    console.log(Status);
   } else {
-    console.log(Status)
+    console.log(Status);
   }
 
   try {
     const project = await prisma.project.create({
       data: {
-        projectName: projectName, description, endDate: new Date(endDate).toISOString()
-        , startDate: new Date(startDate).toISOString(), status: Status
-      }
-    })
+        projectName: projectName,
+        description,
+        endDate: new Date(endDate).toISOString(),
+        startDate: new Date(startDate).toISOString(),
+        status: Status,
+      },
+    });
 
     res.status(200).json({
       data: { ...project, users: [], tasks: [] },
-      msg: "project created successfully"
-    })
+      msg: "project created successfully",
+    });
     // res.status(200)
   } catch (err) {
-    console.log("Error in creating project ", err)
-    throw new Error("Error in creating project")
+    console.log("Error in creating project ", err);
+    throw new Error("Error in creating project");
   }
+};
+
+export const getTotalProjectCount = async (req, res) => {
+  const count = await prisma.project.count();
+  res.status(200).json({ totalProjectCount: count });
+};
+
+export const getAllProjectCountByStatus = async (req, res) => {
+  const count = await prisma.project.groupBy({
+    by: ["status"],
+    _count: true,
+  });
+
+  return res.status(200).json({
+    message: "Project count by status fetched successfully",
+    data: count,
+  });
 };
 
 export const getAllProject = async (req, res) => {
   try {
     const page = req.query.page || 1;
     const limit = req.query.limit || 20;
-    const status = req.query.status || '';
-    const search = req.query.search || '';
-    
+    const status = req.query.status || "";
+    const search = req.query.search || "";
+
     const skip = (page - 1) * limit;
-    
+
     // simple where clause
     let whereClause = {};
     if (status) {
@@ -47,8 +68,17 @@ export const getAllProject = async (req, res) => {
     if (search) {
       whereClause.OR = [
         { projectName: { contains: search } },
-        { description: { contains: search } }
+        { description: { contains: search } },
       ];
+    }
+
+    const chachedData = await redis.get("all_projects");
+
+    console.log(JSON.parse(chachedData));
+    if (chachedData) {
+      console.log("Serving from cache");
+    } else {
+      console.log("Serving from database");
     }
 
     // get projects with only needed fields
@@ -68,13 +98,13 @@ export const getAllProject = async (req, res) => {
         _count: {
           select: {
             tasks: true,
-            users: true
-          }
-        }
+            users: true,
+          },
+        },
       },
       orderBy: {
-        startDate: 'desc'
-      }
+        startDate: "desc",
+      },
     });
 
     // get total count
@@ -87,8 +117,8 @@ export const getAllProject = async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (err) {
     console.log(err);
@@ -102,7 +132,7 @@ export const getProjectByID = async (req, res) => {
 
     const project = await prisma.project.findUnique({
       where: {
-        id: id
+        id: id,
       },
       select: {
         id: true,
@@ -127,14 +157,14 @@ export const getProjectByID = async (req, res) => {
                 name: true,
                 email: true,
                 avatar: true,
-                department: true
-              }
-            }
+                department: true,
+              },
+            },
           },
           take: 50,
           orderBy: {
-            id: 'desc'
-          }
+            id: "desc",
+          },
         },
         // get basic user info
         users: {
@@ -147,27 +177,27 @@ export const getProjectByID = async (req, res) => {
             role: true,
             _count: {
               select: {
-                tasks: true
-              }
-            }
+                tasks: true,
+              },
+            },
           },
           take: 10,
           orderBy: {
-            name: 'asc'
-          }
-        }
-      }
+            name: "asc",
+          },
+        },
+      },
     });
-    
+
     if (!project) {
       return res.status(404).json({
-        message: "project not found"
+        message: "project not found",
       });
     }
-    
+
     res.status(200).json({
       message: "project fetched successfully",
-      data: project
+      data: project,
     });
   } catch (err) {
     console.log(err);
@@ -176,21 +206,21 @@ export const getProjectByID = async (req, res) => {
 };
 
 export const deleteProject = async (req, res) => {
-  const id = req.params
+  const id = req.params;
 
   try {
     await prisma.project.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     res.status(200).json({
-      msg: "project deleted successfully"
-    })
+      msg: "project deleted successfully",
+    });
   } catch (err) {
-    console.log("Error in deleting project ", err)
-    throw new Error("Error in deleting project")
+    console.log("Error in deleting project ", err);
+    throw new Error("Error in deleting project");
   }
 };
 
@@ -222,23 +252,22 @@ export const addtaskToProject = async (req, res) => {
       data: {
         project: {
           connect: {
-            id: projectId
+            id: projectId,
           },
         },
       },
-    })
-
+    });
 
     res.status(200).json({
       message: "task added to project successfully",
       data: project,
-    })
+    });
   } catch (err) {
     console.log("Error in adding task to project", err);
     res.status(400).json({
       err: err,
-      msg: "error is adding Task to project"
-    })
+      msg: "error is adding Task to project",
+    });
     throw new Error("Error in adding task to project");
   }
 };
@@ -248,18 +277,18 @@ export const getAllProjectByUser = async (req, res) => {
     const id = req.params.id;
     const page = req.query.page || 1;
     const limit = req.query.limit || 20;
-    const status = req.query.status || '';
-    
+    const status = req.query.status || "";
+
     const skip = (page - 1) * limit;
-    
+
     // check if user exists
     const user = await prisma.user.findUnique({
       where: { id: id },
-      select: { id: true, name: true }
+      select: { id: true, name: true },
     });
-    
+
     if (!user) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: "User not found",
       });
     }
@@ -268,11 +297,11 @@ export const getAllProjectByUser = async (req, res) => {
     let whereClause = {
       users: {
         some: {
-          id: id
-        }
-      }
+          id: id,
+        },
+      },
     };
-    
+
     if (status) {
       whereClause.status = status;
     }
@@ -293,13 +322,13 @@ export const getAllProjectByUser = async (req, res) => {
         _count: {
           select: {
             tasks: true,
-            users: true
-          }
-        }
+            users: true,
+          },
+        },
       },
       orderBy: {
-        startDate: 'desc'
-      }
+        startDate: "desc",
+      },
     });
 
     // get total count
@@ -312,14 +341,13 @@ export const getAllProjectByUser = async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error in getting user projects" });
   }
-}; 
-
+};
 
 // delete task from project
