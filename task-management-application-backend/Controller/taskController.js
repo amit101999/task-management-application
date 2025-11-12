@@ -72,11 +72,11 @@ export const createtask = async (req, res) => {
     });
 
     // send email to user which is added to task
-    await queue.add("send-task-email", {
-      email: userEmail,
-      text: `Hi ${req.user.name} , You have been assigned a new task with id : ${title} ,
-       please check your dashboard for more details`,
-    });
+    // await queue.add("send-task-email", {
+    //   email: userEmail,
+    //   text: `Hi ${req.user.name} , You have been assigned a new task with id : ${title} ,
+    //    please check your dashboard for more details`,
+    // });
 
     res.status(200).json({
       msg: "task Created successfully",
