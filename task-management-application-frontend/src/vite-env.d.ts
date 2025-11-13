@@ -6,15 +6,15 @@ interface Member {
   role: string;
 }
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'google';
-  size?: 'lg';
+  variant?: "primary" | "google";
+  size?: "lg";
   children: React.ReactNode;
 }
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  value: string
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
   icon?: React.ReactNode;
 }
 
@@ -23,7 +23,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 //   name String
 //   avatar String?
 //   email String @unique
-//   password String? 
+//   password String?
 //   role UserRole? @default(MEMBER)
 //   projects Project[]
 //   tasks Task[]
@@ -36,31 +36,31 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 // used intreface
 
 interface UserTask {
-  id: string,
-  title: string,
-  description: string,
-  priority: string,
-  task_status: string,
-  dueDate: string,
-  startdate: string,
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  task_status: string;
+  dueDate: string;
+  startdate: string;
 }
 interface UserType {
-  id: string,
-  name: string,
-  avatar?: string,
-  role: string,
-  email: string
-  password?: string,
-  tasks?: Task[],
-  projects?: ProjectType[],
+  id: string;
+  name: string;
+  avatar?: string;
+  role: string;
+  email: string;
+  password?: string;
+  tasks?: Task[];
+  projects?: ProjectType[];
   _count?: {
-    tasks: number,
-    projects: number
-  },
-  phone?: number
-  lastLogin?: Date
-  department?: string
-  createdAt?: Date
+    tasks: number;
+    projects: number;
+  };
+  phone?: number;
+  lastLogin?: Date;
+  department?: string;
+  createdAt?: Date;
 }
 
 interface ProjectType {
@@ -69,7 +69,7 @@ interface ProjectType {
   description: string;
   completedTask: number;
   startDate: string;
-  status: 'ACTIVE' | 'COMPLETED' | 'UPCOMING'
+  status: "ACTIVE" | "COMPLETED" | "UPCOMING";
   endDate: string;
   users?: UserType[];
   tasks?: Task[];
@@ -80,29 +80,26 @@ interface ProjectType {
 }
 
 interface Task {
-  id?: string
+  id?: string;
   title: string;
   description: string;
   assignedTo: UserType | null;
   project: ProjectType | null;
   taskStatus: "OPEN" | "INPROGRESS" | "CLOSED";
   priority: "High" | "Medium" | "Low";
-  startDate?: string
-  dueDate?: string
+  startDate?: string;
+  dueDate?: string;
 }
-
 
 interface Project {
   id: string;
   title: string;
-  status: 'Active' | 'Completed' | 'Upcoming';
+  status: "Active" | "Completed" | "Upcoming";
   dueDate: string;
   assignedMembers: number;
   description: string;
-  priority: 'High' | 'Medium' | 'Low';
+  priority: "High" | "Medium" | "Low";
 }
-
-
 
 // member interface
 interface NavItem {
@@ -145,7 +142,7 @@ interface MemberTask {
   title: string;
   project: string;
   due: string;
-  status: 'progress' | 'completed' | 'pending';
+  status: "progress" | "completed" | "pending";
 }
 
-type SectionType = 'dashboard' | 'tasks' | 'projects' | 'profile';
+type SectionType = "dashboard" | "tasks" | "projects" | "profile";

@@ -94,6 +94,7 @@ export const userLogin = async (req, res) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar,
+      id: user.id,
     };
 
     // create token
@@ -203,6 +204,12 @@ export const getUserByID = async (req, res) => {
   try {
     const id = req.params.id;
 
+    if (!id) {
+      return res.status(400).json({
+        message: "User ID is required",
+      });
+    }
+
     const user = await prisma.user.findUnique({
       where: {
         id,
@@ -217,45 +224,6 @@ export const getUserByID = async (req, res) => {
         department: true,
         createdAt: true,
         lastLogin: true,
-        // get only recent tasks with basic info
-        tasks: {
-          select: {
-            id: true,
-            title: true,
-            taskStatus: true,
-            dueDate: true,
-            priority: true,
-            project: {
-              select: {
-                id: true,
-                projectName: true,
-              },
-            },
-          },
-          take: 10,
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        // get only recent projects with basic info
-        projects: {
-          select: {
-            id: true,
-            projectName: true,
-            status: true,
-            startDate: true,
-            endDate: true,
-            _count: {
-              select: {
-                tasks: true,
-              },
-            },
-          },
-          take: 10,
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
       },
     });
 
@@ -270,7 +238,10 @@ export const getUserByID = async (req, res) => {
       data: user,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Error in getting user by id" });
+    console.error("Error in getUserByID:", err);
+    res.status(500).json({ 
+      message: "Error in getting user by id",
+      error: err.message 
+    });
   }
 };

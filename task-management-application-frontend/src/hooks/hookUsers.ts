@@ -1,12 +1,22 @@
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { loadUser, setLoading, setError } from "../redux/userSlice";
+import {
+  loadUser,
+  setLoading,
+  setError,
+  loginSuccess,
+} from "../redux/userSlice";
 
 // simple hook to fetch users with pagination
-export const UsefetchUsers = (page = 1, limit = 20, search = '', department = '') => {
+export const UsefetchUsers = (
+  page = 1,
+  limit = 20,
+  search = "",
+  department = ""
+) => {
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -38,14 +48,14 @@ export const UsefetchUsers = (page = 1, limit = 20, search = '', department = ''
 // simple hook to fetch single user by id
 export const UsefetchUserById = (userId: string | undefined) => {
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     const loadUserById = async () => {
       if (!userId) return;
-      
+
       try {
         dispatch(setLoading(true));
-        await axios.get(
+        const data = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/user/getUser/${userId}`,
           {
             headers: {
@@ -57,6 +67,8 @@ export const UsefetchUserById = (userId: string | undefined) => {
         );
         // you can add a setUser action if needed
         dispatch(setLoading(false));
+        dispatch(loginSuccess(data.data));
+        console.log("Fetched user by ID:", data.data);
       } catch (error) {
         console.log("Error fetching user:", error);
         dispatch(setError("Failed to fetch user"));
@@ -64,5 +76,5 @@ export const UsefetchUserById = (userId: string | undefined) => {
       }
     };
     loadUserById();
-  }, [dispatch, userId]);
+  }, [userId]);
 };

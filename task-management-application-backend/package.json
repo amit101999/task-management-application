@@ -6,7 +6,8 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "nodemon index.js",
-        "email-server": "nodemon queue/workerQueue.js"
+        "email-server": "nodemon queue/workerQueue.js",
+        "cron:login": "node cron/loginCron.js"
     },
     "author": "",
     "license": "ISC",
@@ -30,6 +31,7 @@
         "multer": "^2.0.2",
         "multer-storage-cloudinary": "^4.0.0",
         "nodemailer": "^7.0.5",
+        "node-cron": "^3.0.3",
         "nodemon": "^3.1.10",
         "prisma": "^6.11.1",
         "redis": "^5.6.0",

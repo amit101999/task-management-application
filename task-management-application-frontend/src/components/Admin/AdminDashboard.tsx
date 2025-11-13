@@ -12,11 +12,8 @@ import {
 } from "recharts";
 import SideBar from "../../sharedComponents/Admin/SideBar";
 import Header from "../../sharedComponents/Admin/Header";
-import { UsefetchTask } from "../../hooks/hookTask";
-import { UseFetchProject } from "../../hooks/hookProject";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import { UsefetchUsers } from "../../hooks/hookUsers";
 import { socket } from "../../main";
 import ActivityFeed from "./RecentTask";
 import { useEffect, useState } from "react";
@@ -35,7 +32,7 @@ type ProjectCountType = {
   completedProjects: number;
 };
 
-// Sample data for charts
+// Sample data for charts 
 
 const weeklyProgressData = [
   { day: "Mon", completed: 12, inProgress: 8 },
@@ -53,32 +50,33 @@ const AdminDashboard = () => {
     // Update state for notifications/activities
   });
 
+  const { projects } = useSelector((store: RootState) => store.projects);
+  const { tasks } = useSelector((store: RootState) => store.tasks);
+  const { user } = useSelector((store: RootState) => store.user);
+
   const [projectCount, setProjectCount] = useState<ProjectCountType>({
-    totalProjects: 0,
-    activeProjects: 0,
-    completedProjects: 0,
+    totalProjects: projects?.length,
+    activeProjects: projects?.filter((p) => p.status === "ACTIVE").length,
+    completedProjects: projects?.filter((p) => p.status === "COMPLETED").length,
   });
   const [taskCount, setTaskCount] = useState<taskCountType>({
-    totalTasks: 0,
-    openTasks: 0,
-    inProgressTasks: 0,
-    closedTasks: 0,
+    totalTasks: tasks?.length,
+    openTasks: tasks?.filter((t) => t.taskStatus === "OPEN").length,
+    inProgressTasks: tasks?.filter((t) => t.taskStatus === "INPROGRESS").length,
+    closedTasks: tasks?.filter((t) => t.taskStatus === "CLOSED").length,
   });
-
-  // fetching all users in redux
-  // UsefetchTask();
-  // UseFetchProject();
-  // UsefetchUsers();
-
-  // const { projects } = useSelector((store: RootState) => store.projects);
-  // const { tasks } = useSelector((store: RootState) => store.tasks);
-  const { user } = useSelector((store: RootState) => store.user);
 
   useEffect(() => {
     const fetchData = async () => {
       const [PC, TC] = await Promise.all([
-        axios.get("http://localhost:6500/api/project/get/getTotalProjectCount"),
-        axios.get("http://localhost:6500/api/task/get/getTotaltaskCount"),
+        axios.get(
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/api/project/get/getTotalProjectCount`
+        ),
+        axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/task/get/getTotaltaskCount`
+        ),
       ]);
       setProjectCount((prev) => ({
         ...prev,
@@ -97,11 +95,15 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       const [PC, TC] = await Promise.all([
         axios.get(
-          "http://localhost:6500/api/project/get/getAllProjectCountByStatus"
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/api/project/get/getAllProjectCountByStatus`
         ),
-        axios.get("http://localhost:6500/api/task/get/taskcountbystatus"),
+        axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/task/get/taskcountbystatus`
+        ),
       ]);
-      console.log("Project Count by status:", PC.data.data);
+      console.log("task Count by status:", TC.data.data);
       setProjectCount((prev) => ({
         ...prev,
         activeProjects: PC.data.data[0]._count,
@@ -109,9 +111,9 @@ const AdminDashboard = () => {
       }));
       setTaskCount((prev) => ({
         ...prev,
-        openTasks: TC.data.data[1]?._count,
+        openTasks: TC.data.data[0]?._count,
         inProgressTasks: TC.data.data[2]?._count,
-        closedTasks: TC.data.data[0]?._count,
+        closedTasks: TC.data.data[1]?._count,
       }));
     };
 

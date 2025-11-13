@@ -72,15 +72,6 @@ export const getAllProject = async (req, res) => {
       ];
     }
 
-    const chachedData = await redis.get("all_projects");
-
-    console.log(JSON.parse(chachedData));
-    if (chachedData) {
-      console.log("Serving from cache");
-    } else {
-      console.log("Serving from database");
-    }
-
     // get projects with only needed fields
     const projects = await prisma.project.findMany({
       where: whereClause,
@@ -89,15 +80,12 @@ export const getAllProject = async (req, res) => {
       select: {
         id: true,
         projectName: true,
-        description: true,
         status: true,
         startDate: true,
         endDate: true,
-        completedTask: true,
         // get counts instead of full relations
         _count: {
           select: {
-            tasks: true,
             users: true,
           },
         },
@@ -108,7 +96,7 @@ export const getAllProject = async (req, res) => {
     });
 
     // get total count
-    const totalCount = await prisma.project.count({ where: whereClause });
+    // const totalCount = await prisma.project.count({ where: whereClause });
 
     res.status(200).json({
       message: "All project fetched successfully",
@@ -116,8 +104,8 @@ export const getAllProject = async (req, res) => {
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / limit),
+        total: 10,
+        totalPages: Math.ceil(100 / limit),
       },
     });
   } catch (err) {
@@ -130,6 +118,13 @@ export const getProjectByID = async (req, res) => {
   try {
     const id = req.params.id;
 
+    if (!id) {
+      return res.status(400).json({
+        message: "Project ID is required",
+      });
+    }
+
+    // Fetch project with optimized queries
     const project = await prisma.project.findUnique({
       where: {
         id: id,
@@ -142,7 +137,7 @@ export const getProjectByID = async (req, res) => {
         startDate: true,
         endDate: true,
         completedTask: true,
-        // get recent tasks with basic info
+        // Fetch only recent 20 tasks (reduced from 50)
         tasks: {
           select: {
             id: true,
@@ -161,12 +156,12 @@ export const getProjectByID = async (req, res) => {
               },
             },
           },
-          take: 50,
+          take: 20,
           orderBy: {
             id: "desc",
           },
         },
-        // get basic user info
+        // Fetch users without task counts to avoid N+1 queries
         users: {
           select: {
             id: true,
@@ -175,15 +170,17 @@ export const getProjectByID = async (req, res) => {
             avatar: true,
             department: true,
             role: true,
-            _count: {
-              select: {
-                tasks: true,
-              },
-            },
           },
-          take: 10,
+          take: 20,
           orderBy: {
             name: "asc",
+          },
+        },
+        // Get task counts separately for better performance
+        _count: {
+          select: {
+            tasks: true,
+            users: true,
           },
         },
       },
@@ -191,17 +188,20 @@ export const getProjectByID = async (req, res) => {
 
     if (!project) {
       return res.status(404).json({
-        message: "project not found",
+        message: "Project not found",
       });
     }
 
     res.status(200).json({
-      message: "project fetched successfully",
+      message: "Project fetched successfully",
       data: project,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Error in getting project by id" });
+    console.error("Error in getProjectByID:", err);
+    res.status(500).json({ 
+      message: "Error in getting project by id",
+      error: err.message 
+    });
   }
 };
 
@@ -332,7 +332,7 @@ export const getAllProjectByUser = async (req, res) => {
     });
 
     // get total count
-    const totalCount = await prisma.project.count({ where: whereClause });
+    // const totalCount = await prisma.project.count({ where: whereClause });
 
     res.status(200).json({
       message: "User project fetched successfully",
@@ -340,8 +340,8 @@ export const getAllProjectByUser = async (req, res) => {
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / limit),
+        total: 100,
+        totalPages: Math.ceil(100 / limit),
       },
     });
   } catch (err) {
