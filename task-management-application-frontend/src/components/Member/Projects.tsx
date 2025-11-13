@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search, Calendar, ChevronRight, Target, ArrowLeft } from 'lucide-react';
 import Header from '../../sharedComponents/Member/Header';
 import Sidebar from '../../sharedComponents/Member/Sidebar';
