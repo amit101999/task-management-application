@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   User,
   Lock,
@@ -13,20 +13,52 @@ import {
 import SideBar from "../../sharedComponents/Admin/SideBar";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
+import { loginSuccess, setError, setLoading } from "../../redux/userSlice";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 
 const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const { user } = useSelector((state: RootState) => state.user);
-  console.log(user);
-  // Mock admin data
-  const [adminProfile, setAdminProfile] = useState<UserType | null>(null);
 
-  useState(() => {
-    setAdminProfile(user);
-  });
+  const { user } = useSelector((store: RootState) => store.user);
+  const dispatch = useDispatch();
 
-  const [editForm, setEditForm] = useState<UserType | null>(adminProfile);
+  const [adminProfile, setAdminProfile] = useState<UserType | null>(user);
+  const [editForm, setEditForm] = useState<UserType | null>(user);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user?.id) return;
+
+      try {
+        dispatch(setLoading(true));
+        const token = JSON.parse(localStorage.getItem("token") || "");
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/user/getUser/${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const userData = response.data.data;
+        setAdminProfile(userData);
+        setEditForm(userData);
+        dispatch(loginSuccess(userData));
+        dispatch(setLoading(false));
+      } catch (error) {
+        console.log("Error fetching user:", error);
+        dispatch(setError("Failed to fetch user"));
+        dispatch(setLoading(false));
+        setAdminProfile(user);
+        setEditForm(user);
+      }
+    };
+
+    fetchUserData();
+  }, [user?.id, dispatch]);
 
   const handleSave = () => {
     setAdminProfile(editForm);
@@ -39,7 +71,9 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleInputChange = (field: keyof UserType, value: any) => {
-    setEditForm((prev) => ({ ...(prev ?? {} as UserType), [field]: value } as UserType));
+    setEditForm(
+      (prev) => ({ ...(prev ?? ({} as UserType)), [field]: value } as UserType)
+    );
   };
 
   return (
@@ -122,7 +156,10 @@ const ProfilePage: React.FC = () => {
                   <div className="flex items-center gap-3 text-xs sm:text-sm">
                     <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
                     <span className="text-gray-600 truncate">
-                      Joining Date : {typeof (user as any)?.createdAt === 'string' ? String((user as any)?.createdAt).split("T")[0] : ''}
+                      Joining Date :{" "}
+                      {typeof (user as any)?.createdAt === "string"
+                        ? String((user as any)?.createdAt).split("T")[0]
+                        : ""}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 text-xs sm:text-sm">
@@ -180,7 +217,7 @@ const ProfilePage: React.FC = () => {
                         />
                       ) : (
                         <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
-                          {user?.email}
+                          {adminProfile?.email || user?.email || ""}
                         </p>
                       )}
                     </div>
@@ -202,7 +239,7 @@ const ProfilePage: React.FC = () => {
                         />
                       ) : (
                         <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
-                          {user?.phone}
+                          {adminProfile?.phone || user?.phone || ""}
                         </p>
                       )}
                     </div>
@@ -227,7 +264,7 @@ const ProfilePage: React.FC = () => {
                         </select>
                       ) : (
                         <p className="text-xs sm:text-sm lg:text-base text-gray-900 py-2 truncate">
-                          {user?.department}
+                          {adminProfile?.department || user?.department || ""}
                         </p>
                       )}
                     </div>

@@ -20,6 +20,8 @@ model User {
   lastLogin  DateTime?
   tasks      Task[]
   projects   Project[] @relation("ProjectToUser")
+
+  @@index([email])
 }
 
 model Project {
@@ -48,14 +50,13 @@ model Task {
   assignedTo  User?     @relation(fields: [userid], references: [id])
 }
 
-model Activity{
-  id  String @id @default(uuid())
-  userid String 
-  description String
+model Activity {
+  id           String   @id @default(uuid())
+  userid       String
+  description  String
   activityType String
-  createdAt DateTime @default(now())
+  createdAt    DateTime @default(now())
 }
-
 
 enum ProjectStatus {
   ACTIVE

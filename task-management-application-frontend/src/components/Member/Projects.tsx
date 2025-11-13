@@ -10,55 +10,62 @@ import axios from 'axios';
 const MemberProjects = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
   const [projectProgress, setProjectProgress] = useState<Record<string, number>>({});
+  const [loadingProject, setLoadingProject] = useState(false);
 
   const { user } = useSelector((store: RootState) => store.user)
   const { filteredProjects } = useSelector((store: RootState) => store.projects);
 
-  // Fetch progress for each project
-  useEffect(() => {
-    const fetchProjectProgress = async () => {
-      if (!filteredProjects || !user?.id) return;
-      
-      const progressData: Record<string, number> = {};
-      
-      for (const project of filteredProjects) {
-        try {
-          const res = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${project.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${JSON.parse(
-                  localStorage.getItem("token") || ""
-                )}`,
-              },
-            }
-          );
-          
-          const tasks = res.data.data.tasks.filter(
-            (item: any) => item.assignedTo?.id === user.id
-          );
-          
-          const closedTasks = tasks.filter(
-            (item: any) => item.taskStatus === "CLOSED"
-          );
-          
-          const progress = tasks.length ? (closedTasks.length / tasks.length) * 100 : 0;
-          progressData[project.id] = progress;
-        } catch (error) {
-          console.error(`Error fetching progress for project ${project.id}:`, error);
-          progressData[project.id] = 0;
-        }
-      }
-      
-      setProjectProgress(progressData);
-    };
+  // Optimized: Only fetch progress when needed (lazy loading)
+  // Removed sequential fetching for all projects on mount
 
-    fetchProjectProgress();
-  }, [filteredProjects, user?.id]);
+  // Fetch progress for a single project when needed
+  const fetchProjectProgress = async (projectId: string) => {
+    if (projectProgress[projectId] !== undefined || !user?.id) {
+      return projectProgress[projectId] || 0;
+    }
+
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${projectId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(
+              localStorage.getItem("token") || ""
+            )}`,
+          },
+        }
+      );
+      
+      const tasks = res.data.data.tasks.filter(
+        (item: any) => item.assignedTo?.id === user.id
+      );
+      
+      const closedTasks = tasks.filter(
+        (item: any) => item.taskStatus === "CLOSED"
+      );
+      
+      const progress = tasks.length ? (closedTasks.length / tasks.length) * 100 : 0;
+      setProjectProgress(prev => ({ ...prev, [projectId]: progress }));
+      return progress;
+    } catch (error) {
+      console.error(`Error fetching progress for project ${projectId}:`, error);
+      setProjectProgress(prev => ({ ...prev, [projectId]: 0 }));
+      return 0;
+    }
+  };
 
   const getProjectProgress = (projectId: string) => {
     return projectProgress[projectId] || 0;
   }
+
+  // Handle project click with loading state
+  const handleProjectClick = async (project: ProjectType) => {
+    setLoadingProject(true);
+    setSelectedProject(project);
+    // Fetch progress in background
+    await fetchProjectProgress(project.id);
+    setLoadingProject(false);
+  };
 
   // const getProjectTasks = (projectId: string) => {
   //   return tasks?.filter(task => task.id === projectId);
@@ -111,7 +118,7 @@ const MemberProjects = () => {
                     <div
                       key={project.id}
                       className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => setSelectedProject(project)}
+                      onClick={() => handleProjectClick(project)}
                     >
                       <div className="flex items-start justify-between mb-3 sm:mb-4">
                         <div className="flex-1 min-w-0">
@@ -166,7 +173,10 @@ const MemberProjects = () => {
                 {/* Project Details Header */}
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <button
-                    onClick={() => setSelectedProject(null)}
+                    onClick={() => {
+                      setSelectedProject(null);
+                      setLoadingProject(false);
+                    }}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                   >
                     <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
@@ -176,8 +186,17 @@ const MemberProjects = () => {
                     <p className="text-sm sm:text-base text-gray-600 line-clamp-2">{selectedProject?.description}</p>
                   </div>
                 </div>
-                {/* Project Tasks */}
-                <ProjectTask selectedProject={selectedProject} userId={user?.id} />
+                {/* Project Tasks with Loading State */}
+                {loadingProject ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      <p className="text-gray-600">Loading project details...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <ProjectTask selectedProject={selectedProject} userId={user?.id} />
+                )}
               </>
             )}
           </div>

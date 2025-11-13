@@ -86,6 +86,7 @@ const LoginPage: React.FC = () => {
         credentials
       );
       const data = res.data.data;
+      console.log(data);
       // storing token in localstorage
       localStorage.setItem("token", JSON.stringify(res.data.token));
 

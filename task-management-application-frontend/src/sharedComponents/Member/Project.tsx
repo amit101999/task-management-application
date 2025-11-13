@@ -17,49 +17,58 @@ interface PropType {
 }
 
 const ProjectTask = ({ selectedProject, userId }: PropType) => {
-  const [tasks, setTasks] = useState<Task[]>();
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    setTasks(selectedProject?.tasks);
-  }, [selectedProject]);
-
-  // const [project, setProject] = useState<ProjectType[]>()
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjectsByid = async () => {
+      if (!selectedProject?.id || !userId) {
+        setLoading(false);
+        return;
+      }
+
       try {
+        setLoading(true);
+        setError(null);
+        
+        const token = JSON.parse(localStorage.getItem("token") || "");
         const res = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${
-            selectedProject.id
-          }`,
+          `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${selectedProject.id}`,
           {
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
-        // console.log("hello",res.data.data.tasks)
-        const data = res.data.data.tasks.filter(
+        const allTasks = res.data.data.tasks || [];
+        const filteredTasks = allTasks.filter(
           (item: any) => item.assignedTo?.id === userId
         );
-        setTasks(data);
+        setTasks(filteredTasks);
         
         // Calculate progress based on filtered tasks
-        const closedTask = data.filter(
+        const closedTask = filteredTasks.filter(
           (item: any) => item.taskStatus === "CLOSED"
         );
-        const calculatedProgress = data.length ? (closedTask.length / data.length) * 100 : 0;
+        const calculatedProgress = filteredTasks.length 
+          ? (closedTask.length / filteredTasks.length) * 100 
+          : 0;
         setProgress(calculatedProgress);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
+      } catch (err: any) {
+        console.error("Error fetching project:", err);
+        setError(err.response?.data?.message || "Failed to load project tasks");
+        setTasks([]);
+        setProgress(0);
+      } finally {
+        setLoading(false);
       }
     };
+    
     fetchProjectsByid();
-  }, [selectedProject, setTasks]);
+  }, [selectedProject?.id, userId]);
 
   const getStatusBadge = (status: string) => {
     const baseClasses =
@@ -113,6 +122,37 @@ const ProjectTask = ({ selectedProject, userId }: PropType) => {
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="w-full max-w-full overflow-hidden">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading project tasks...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="w-full max-w-full overflow-hidden">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center gap-2">
+            <Circle className="w-5 h-5 text-red-500" />
+            <div>
+              <p className="text-red-900 font-medium">Error loading project</p>
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-full overflow-hidden">

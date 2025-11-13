@@ -178,38 +178,58 @@ const FileIcon: React.FC<{ type: string }> = ({ type }) => {
 };
 
 export default function ProjectDetailsPage() {
-  const [teamMembers, setTeamMembers] = useState<UserType[]>();
-  const [tasks, setTasks] = useState<Task[]>();
+  const [teamMembers, setTeamMembers] = useState<UserType[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
+
   useEffect(() => {
-    if (id) {
-      const fetchProject = async () => {
+    const fetchProject = async () => {
+      if (!id) {
+        setError("Project ID is missing");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const token = JSON.parse(localStorage.getItem("token") || "");
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/project/getProject/${id}`,
           {
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log(res.data);
+
         const data = res.data.data;
-        setTeamMembers(data.users);
-        setTasks(data.tasks);
-      };
-      fetchProject();
-      dispatch(selectprojectById(id));
-    }
+        setTeamMembers(data.users || []);
+        setTasks(data.tasks || []);
+        
+        // Update Redux with full project data
+        dispatch(selectprojectById(id));
+      } catch (err: any) {
+        console.error("Error fetching project:", err);
+        setError(err.response?.data?.message || "Failed to load project");
+        setTeamMembers([]);
+        setTasks([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
   }, [id, dispatch]);
 
   const { selectedProjectId } = useSelector(
     (store: RootState) => store.projects
   );
   const [newComment, setNewComment] = useState("");
-  console.log(selectedProjectId);
 
   const openTask = tasks?.filter((item) => item.taskStatus === "OPEN");
   const closedTask = tasks?.filter((item) => item.taskStatus === "CLOSED");
@@ -300,14 +320,21 @@ export default function ProjectDetailsPage() {
   ];
 
   const taskStatusData = [
-    { name: "Completed", value: closedTask?.length, color: "#10B981" },
-    { name: "In Progress", value: inprogressTask?.length, color: "#F59E0B" },
-    { name: "Todo", value: openTask?.length, color: "#6B7280" },
+    { name: "Completed", value: closedTask?.length || 0, color: "#10B981" },
+    { name: "In Progress", value: inprogressTask?.length || 0, color: "#F59E0B" },
+    { name: "Todo", value: openTask?.length || 0, color: "#6B7280" },
   ];
-  const memberTaskData = teamMembers?.map((member) => ({
-    name: member?.name,
-    tasks: member?.tasks?.length ?? 0,
-  }));
+  
+  // Calculate tasks per member from the tasks array
+  const memberTaskData = teamMembers?.map((member) => {
+    const memberTasks = tasks?.filter(
+      (task) => task.assignedTo?.id === member.id
+    ) || [];
+    return {
+      name: member?.name || "Unknown",
+      tasks: memberTasks.length,
+    };
+  }) || [];
 
   const burndownData = [
     { day: "Week 1", ideal: 100, actual: 98 },
@@ -362,6 +389,37 @@ export default function ProjectDetailsPage() {
       </span>
     );
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+        <SideBar />
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading project details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+        <SideBar />
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <p className="text-gray-900 font-medium mb-2">Error loading project</p>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
@@ -632,7 +690,7 @@ export default function ProjectDetailsPage() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-sm font-medium text-gray-900">
-                          hello
+                          {tasks?.filter((task) => task.assignedTo?.id === member.id).length || 0}
                         </p>
                         <p className="text-xs text-gray-500">tasks</p>
                       </div>

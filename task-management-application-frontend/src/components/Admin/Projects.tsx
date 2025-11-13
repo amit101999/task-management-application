@@ -1,4 +1,4 @@
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   FolderOpen,
   Users,
@@ -7,41 +7,47 @@ import {
   Edit,
   Trash2,
   Calendar,
-} from 'lucide-react';
-import SideBar from '../../sharedComponents/Admin/SideBar';
-import Header from '../../sharedComponents/Admin/Header';
-import CreateProject from './CreateProject';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../redux/store';
-import { Link } from 'react-router';
-import { useDispatch } from 'react-redux';
-import { filterProjects } from '../../redux/projectSlice';
-
+} from "lucide-react";
+import SideBar from "../../sharedComponents/Admin/SideBar";
+import Header from "../../sharedComponents/Admin/Header";
+import CreateProject from "./CreateProject";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store";
+import { Link } from "react-router";
+import { useDispatch } from "react-redux";
+import { filterProjects } from "../../redux/projectSlice";
+import { UseFetchProject } from "../../hooks/hookProject";
 
 const ProjectsPage = () => {
+  
+  UseFetchProject();
 
   const dispatch = useDispatch();
-  const [activeFilter, setActiveFilter] = useState<'ALL' | 'ACTIVE' | 'COMPLETED' | 'UPCOMING'>('ALL');
+  const [activeFilter, setActiveFilter] = useState<
+    "ALL" | "ACTIVE" | "COMPLETED" | "UPCOMING"
+  >("ALL");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  //  const {projects} = useSelector((store : RootState ) => store.projects) 
-  const { filteredProjects } = useSelector((store: RootState) => store.projects);
+  //  const {projects} = useSelector((store : RootState ) => store.projects)
+  const { filteredProjects } = useSelector(
+    (store: RootState) => store.projects
+  );
 
   const getStatusColor = (status: string) => {
     switch (status?.toUpperCase()) {
-      case 'ACTIVE':
-        return 'bg-blue-100 text-blue-800';
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800';
-      case 'UPCOMING':
-        return 'bg-yellow-100 text-yellow-800';
+      case "ACTIVE":
+        return "bg-blue-100 text-blue-800";
+      case "COMPLETED":
+        return "bg-green-100 text-green-800";
+      case "UPCOMING":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   useEffect(() => {
     dispatch(filterProjects(activeFilter));
-  }, [activeFilter])
+  }, [activeFilter]);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
@@ -58,8 +64,12 @@ const ProjectsPage = () => {
           {/* Header with Create Button */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Projects Overview</h2>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">Manage and track all your projects</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                Projects Overview
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
+                Manage and track all your projects
+              </p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -74,18 +84,21 @@ const ProjectsPage = () => {
           {/* Filters */}
           <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 mb-6">
             <div className="flex flex-wrap gap-2">
-              {(['ALL', 'ACTIVE', 'COMPLETED', 'UPCOMING'] as const).map((filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${activeFilter === filter
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-100'
+              {(["ALL", "ACTIVE", "COMPLETED", "UPCOMING"] as const).map(
+                (filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setActiveFilter(filter)}
+                    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                      activeFilter === filter
+                        ? "bg-blue-100 text-blue-700"
+                        : "text-gray-600 hover:bg-gray-100"
                     }`}
-                >
-                  {filter}
-                </button>
-              ))}
+                  >
+                    {filter}
+                  </button>
+                )
+              )}
             </div>
           </div>
 
@@ -107,7 +120,10 @@ const ProjectsPage = () => {
             {/* Table Body */}
             <div className="divide-y divide-gray-200">
               {filteredProjects?.map((project) => (
-                <div key={project.id} className="p-3 sm:p-4 lg:px-6 lg:py-4 hover:bg-gray-50 transition-colors">
+                <div
+                  key={project.id}
+                  className="p-3 sm:p-4 lg:px-6 lg:py-4 hover:bg-gray-50 transition-colors"
+                >
                   {/* Desktop Layout */}
                   <div className="hidden lg:grid grid-cols-12 gap-2 items-center">
                     {/* Project Info */}
@@ -117,8 +133,13 @@ const ProjectsPage = () => {
                           <FolderOpen className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="min-w-0">
-                          <Link to={`/projects/${project.id}`} className="text-blue-600 hover:underline">
-                            <h3 className="font-medium text-gray-900 truncate">{project.projectName}</h3>
+                          <Link
+                            to={`/projects/${project.id}`}
+                            className="text-blue-600 hover:underline"
+                          >
+                            <h3 className="font-medium text-gray-900 truncate">
+                              {project.projectName}
+                            </h3>
                           </Link>
                         </div>
                       </div>
@@ -127,7 +148,11 @@ const ProjectsPage = () => {
                     {/* Status */}
                     <div className="col-span-1">
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                            project.status
+                          )}`}
+                        >
                           {project.status}
                         </span>
                       </div>
@@ -144,7 +169,7 @@ const ProjectsPage = () => {
                     <div className="col-span-2 flex justify-center">
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <Calendar className="w-4 h-4" />
-                        <span>{project.startDate?.split('T')[0]}</span>
+                        <span>{project.startDate?.split("T")[0]}</span>
                       </div>
                     </div>
 
@@ -159,7 +184,9 @@ const ProjectsPage = () => {
                     {/* Actions */}
                     <div className="col-span-1 items-center justify-center flex">
                       <div className="flex items-center space-x-1">
-                        <span className='t hover:underline hover:cursor-pointer'>Edit </span>
+                        <span className="t hover:underline hover:cursor-pointer">
+                          Edit{" "}
+                        </span>
                         <button className="p-1 text-gray-400 hover:text-green-600 transition-colors">
                           <Edit className="w-4 h-4" />
                         </button>
@@ -167,13 +194,14 @@ const ProjectsPage = () => {
                     </div>
                     <div className="col-span-1 items-center justify-center flex">
                       <div className="flex items-center ">
-                        <span className='t hover:underline hover:cursor-pointer'>Delete </span>
+                        <span className="t hover:underline hover:cursor-pointer">
+                          Delete{" "}
+                        </span>
                         <button className="p-1 text-gray-400 hover:text-red-600 transition-colors">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-
                   </div>
 
                   {/* Mobile/Tablet Layout */}
@@ -185,12 +213,21 @@ const ProjectsPage = () => {
                           <FolderOpen className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <Link to={`/projects/${project.id}`} className="text-blue-600 hover:underline">
-                            <h3 className="font-medium text-gray-900 truncate">{project.projectName}</h3>
+                          <Link
+                            to={`/projects/${project.id}`}
+                            className="text-blue-600 hover:underline"
+                          >
+                            <h3 className="font-medium text-gray-900 truncate">
+                              {project.projectName}
+                            </h3>
                           </Link>
                         </div>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${getStatusColor(project.status)}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${getStatusColor(
+                          project.status
+                        )}`}
+                      >
                         {project.status}
                       </span>
                     </div>
@@ -199,11 +236,15 @@ const ProjectsPage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                       <div className="flex items-center space-x-2 text-gray-600">
                         <Calendar className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">Due: {project.endDate?.split("T")[0]}</span>
+                        <span className="truncate">
+                          Due: {project.endDate?.split("T")[0]}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2 text-gray-600">
                         <Calendar className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">Start: {project.startDate?.split('T')[0]}</span>
+                        <span className="truncate">
+                          Start: {project.startDate?.split("T")[0]}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2 text-gray-600">
                         <Users className="w-4 h-4 flex-shrink-0" />
@@ -232,7 +273,9 @@ const ProjectsPage = () => {
             {filteredProjects?.length === 0 && (
               <div className="text-center py-12 px-4">
                 <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-sm sm:text-base">No projects found matching your criteria</p>
+                <p className="text-gray-500 text-sm sm:text-base">
+                  No projects found matching your criteria
+                </p>
               </div>
             )}
           </div>
