@@ -1,7 +1,9 @@
 import Redis from "ioredis";
-const redis = new Redis(
-  "redis://default:6AQDmLgIT0QEOxvK3LyaGB5znTuscpEQ@redis-12572.crce182.ap-south-1-1.ec2.redns.redis-cloud.com:12572"
-);
+const redisUrl = process.env.REDIS_URL || process.env.REDIS_PUBLIC_URL;
+const redis = redisUrl ? new Redis(redisUrl) : new Redis({
+  host: process.env.REDIS_HOST || '127.0.0.1',
+  port: process.env.REDIS_PORT || 6379,
+});
 
 redis.on("connect", () => {
   console.log("Connected to Redis server");
