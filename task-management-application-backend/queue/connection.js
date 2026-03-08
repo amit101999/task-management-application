@@ -7,3 +7,11 @@ export const connection = redisUrl ? new Redis(redisUrl, { maxRetriesPerRequest:
   port: process.env.REDIS_PORT || 6379,
   maxRetriesPerRequest: null,
 });
+
+connection.on("connect", () => {
+  console.log("Worker Queue: Connected to Redis successfully");
+});
+
+connection.on("error", (err) => {
+  console.error("Worker Queue: Redis connection error:", err);
+});
