@@ -47,16 +47,16 @@ const ProfileImageUpload= ({ setDetails } : propType) => {
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
         Profile Image
       </label>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3">
         {/* Preview Circle */}
-        <div className="w-20 h-20 rounded-full border-2 border-gray-200 flex items-center justify-center overflow-hidden bg-gray-50">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-gray-200 flex items-center justify-center overflow-hidden bg-gray-50 flex-shrink-0">
           {preview ? (
             <img src={preview} alt="Profile preview" className="w-full h-full object-cover" />
           ) : (
-            <User className="w-8 h-8 text-gray-400" />
+            <User className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
           )}
         </div>
         
@@ -64,7 +64,7 @@ const ProfileImageUpload= ({ setDetails } : propType) => {
         <div className="flex-1">
           <div
             className={`
-              relative border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer
+              relative border-2 border-dashed rounded-lg p-2 sm:p-3 text-center transition-colors cursor-pointer
               ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
             `}
             onDragEnter={handleDrag}
@@ -79,11 +79,11 @@ const ProfileImageUpload= ({ setDetails } : propType) => {
               onChange={handleFileInput}
               accept="image/*"
             />
-            <Upload className="mx-auto h-6 w-6 text-gray-400 mb-2" />
-            <p className="text-sm text-gray-600">
+            <Upload className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mb-1" />
+            <p className="text-xs sm:text-sm text-gray-600">
               <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
             </p>
-            <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+            <p className="text-xs text-gray-500 mt-0.5">PNG, JPG up to 5MB</p>
           </div>
         </div>
       </div>

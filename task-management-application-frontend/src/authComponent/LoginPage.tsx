@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router";
 // import { useLogin } from '../hooks/hookUsers';
 import { Button } from "../UIComponents/AuthButtons";
 import { Input } from "../UIComponents/Input";
-import { Card } from "../UIComponents/Card";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -13,6 +12,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import { useGoogleLogin } from "@react-oauth/google";
 import { socket } from "../main";
+import projectManagerImage from "../assets/projectmanager_1.jpg"
 
 // Main Login Component
 const LoginPage: React.FC = () => {
@@ -122,133 +122,145 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl">
-        <Card className="backdrop-blur-sm bg-white/80 border-white/20 shadow-xl p-6 sm:p-8">
-          {/* Logo and Header */}
-          <div className="text-center mb-6 sm:mb-8">
-            <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-              <Target className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+    <div className="h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+      <div className="w-full max-w-6xl h-full max-h-[95vh]">
+        <div className="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col lg:flex-row h-full">
+          {/* Left Side - Login Form */}
+          <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 flex flex-col justify-center overflow-hidden">
+            {/* Logo and Header */}
+            <div className="text-center lg:text-left mb-3 sm:mb-4">
+              <div className="mx-auto lg:mx-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mb-2 shadow-lg">
+                <Target className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                Welcome Back
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-600">
+                Sign in to your Project Tracker account
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600">
-              Sign in to your Project Tracker account
-            </p>
-          </div>
 
-          {/* Login Form */}
-          <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-            <Input
-              value={userState.email}
-              label="Email Address"
-              type="email"
-              name="email"
-              handleChange={handleChange}
-              placeholder="Enter your email"
-              icon={<Mail size={18} className="sm:w-5 sm:h-5" />}
-            />
-
-            <div className="relative">
+            {/* Login Form */}
+            <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
               <Input
-                value={userState.password}
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                name="password"
+                value={userState.email}
+                label="Email Address"
+                type="email"
+                name="email"
                 handleChange={handleChange}
-                placeholder="Enter your password"
-                icon={<Lock size={18} className="sm:w-5 sm:h-5" />}
+                placeholder="Enter your email"
+                icon={<Mail size={16} className="sm:w-4 sm:h-4" />}
               />
-              <button
-                type="button"
-                className="absolute right-3 top-8 sm:top-9 text-gray-400 hover:text-gray-600 transition-colors"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff size={18} className="sm:w-5 sm:h-5" />
-                ) : (
-                  <Eye size={18} className="sm:w-5 sm:h-5" />
-                )}
-              </button>
-            </div>
 
-            {/* Forgot Password Link */}
-            <div className="flex items-center justify-end">
-              <button
-                type="button"
-                className="text-xs sm:text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors"
-              >
-                Forgot your password?
-              </button>
-            </div>
-
-            {/* Login Button */}
-            <Button
-              variant="primary"
-              className="w-full"
-              size="lg"
-              type="submit"
-            >
-              {loader ? (
-                <>
-                  <div className="w-6 h-6 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
-                </>
-              ) : (
-                <> Sign In</>
-              )}
-            </Button>
-
-            {/* Quick Admin Sign In Link */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={quickAdminSignIn}
-                className="text-xs sm:text-sm text-blue-600 hover:text-blue-500 font-medium "
-              >
-                Sign in as Admin
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-xs sm:text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">
-                  or
-                </span>
-              </div>
-            </div>
-          </form>
-
-          {/* Google Login Button */}
-          <Button
-            variant="google"
-            className="w-full"
-            size="lg"
-            type="button"
-            onClick={() => loginwithGoogle()}
-          >
-            Continue with Google
-          </Button>
-
-          {/* Sign Up Link */}
-          <div className="mt-2 sm:mt-2 text-center">
-            <p className="text-xs sm:text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link to="/signup">
+              <div className="relative">
+                <Input
+                  value={userState.password}
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  handleChange={handleChange}
+                  placeholder="Enter your password"
+                  icon={<Lock size={16} className="sm:w-4 sm:h-4" />}
+                />
                 <button
                   type="button"
-                  className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
+                  className="absolute right-3 top-7 sm:top-8 text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  Sign up
+                  {showPassword ? (
+                    <EyeOff size={16} className="sm:w-4 sm:h-4" />
+                  ) : (
+                    <Eye size={16} className="sm:w-4 sm:h-4" />
+                  )}
                 </button>
-              </Link>
-            </p>
+              </div>
+
+              {/* Forgot Password Link */}
+              <div className="flex items-center justify-end -mt-1">
+                <button
+                  type="button"
+                  className="text-xs text-blue-600 hover:text-blue-500 font-medium transition-colors"
+                >
+                  Forgot your password?
+                </button>
+              </div>
+
+              {/* Login Button */}
+              <Button
+                variant="primary"
+                className="w-full"
+                size="lg"
+                type="submit"
+              >
+                {loader ? (
+                  <>
+                    <div className="w-5 h-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  </>
+                ) : (
+                  <> Sign In</>
+                )}
+              </Button>
+
+              {/* Quick Admin Sign In Link */}
+              <div className="text-center -mt-1">
+                <button
+                  type="button"
+                  onClick={quickAdminSignIn}
+                  className="text-xs text-blue-600 hover:text-blue-500 font-medium"
+                >
+                  Sign in as Admin
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="relative -my-1">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-3 bg-white text-gray-500 font-medium">
+                    or
+                  </span>
+                </div>
+              </div>
+            </form>
+
+            {/* Google Login Button */}
+            <Button
+              variant="google"
+              className="w-full mt-1"
+              size="lg"
+              type="button"
+              onClick={() => loginwithGoogle()}
+            >
+              Continue with Google
+            </Button>
+
+            {/* Sign Up Link */}
+            <div className="mt-2 text-center">
+              <p className="text-xs text-gray-600">
+                Don't have an account?{" "}
+                <Link to="/signup">
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
+                  >
+                    Sign up
+                  </button>
+                </Link>
+              </p>
+            </div>
           </div>
-        </Card>
+
+          {/* Right Side - Project Manager Image */}
+          <div className="w-full lg:w-1/2 bg-white hidden lg:flex overflow-hidden">
+            <img
+              src={projectManagerImage}
+              alt="Project Manager Illustration"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

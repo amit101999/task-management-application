@@ -8,6 +8,9 @@ RUN npm install
 # copy source
 COPY . .
 
+ENV VITE_LOGIN_OAUTH_ID=413125396319-v8huk4u61jtntftqphh2bei37a1dkme2.apps.googleusercontent.com
+ENV  VITE_BASE_URL=https://promanage.duckdns.org
+
 # build production files
 RUN npm run build
 
