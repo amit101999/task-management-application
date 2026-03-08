@@ -13,14 +13,15 @@ export const UseFetchActivityByUserId = (id: string | undefined, page = 1, limit
       
       try {
         dispatch(setLoading(true));
+        const token = localStorage.getItem("token");
+        const parsedToken = token ? JSON.parse(token) : "";
+        
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/activity/getActivity/${id}`,
           {
             params: { page, limit, activityType },
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${parsedToken}`,
             },
           }
         );
@@ -45,14 +46,15 @@ export const UseFetchAllActivities = (page = 1, limit = 20, activityType = '', u
     const fetchActivities = async () => {
       try {
         dispatch(setLoading(true));
+        const token = localStorage.getItem("token");
+        const parsedToken = token ? JSON.parse(token) : "";
+        
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/activity/getAllActivities`,
           {
             params: { page, limit, activityType, userId, search },
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${parsedToken}`,
             },
           }
         );
