@@ -69,6 +69,7 @@ export const userSlice = createSlice({
       state.filteredUser = [];
       state.searchQuery = '';
       state.departmentFilter = '';
+      localStorage.removeItem("token");
     },
     
     // simple search filter

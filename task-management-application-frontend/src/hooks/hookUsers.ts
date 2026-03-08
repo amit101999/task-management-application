@@ -21,14 +21,15 @@ export const UsefetchUsers = (
     const loadUsers = async () => {
       try {
         dispatch(setLoading(true));
+        const token = localStorage.getItem("token");
+        const parsedToken = token ? JSON.parse(token) : "";
+        
         const user = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/user/getAllUsers`,
           {
             params: { page, limit, search, department },
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${parsedToken}`,
             },
           }
         );
@@ -55,13 +56,14 @@ export const UsefetchUserById = (userId: string | undefined) => {
 
       try {
         dispatch(setLoading(true));
+        const token = localStorage.getItem("token");
+        const parsedToken = token ? JSON.parse(token) : "";
+        
         const data = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/user/getUser/${userId}`,
           {
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${parsedToken}`,
             },
           }
         );

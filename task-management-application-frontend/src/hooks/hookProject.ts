@@ -11,14 +11,15 @@ export const UseFetchProject = (page = 1, limit = 20, status = '', search = '') 
     const fetchProjects = async () => {
       try {
         dispatch(setLoading(true));
+        const token = localStorage.getItem("token");
+        const parsedToken = token ? JSON.parse(token) : "";
+        
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/project/getAllProject`,
           {
             params: { page, limit, status, search },
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${parsedToken}`,
             },
           }
         );
@@ -45,14 +46,15 @@ export const UseFetchProjectByUserId = (id: string | undefined, page = 1, limit 
       
       try {
         dispatch(setLoading(true));
+        const token = localStorage.getItem("token");
+        const parsedToken = token ? JSON.parse(token) : "";
+        
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/project/user/${id}`,
           {
             params: { page, limit, status },
             headers: {
-              Authorization: `Bearer ${JSON.parse(
-                localStorage.getItem("token") || ""
-              )}`,
+              Authorization: `Bearer ${parsedToken}`,
             },
           }
         );
