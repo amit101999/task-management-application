@@ -33,9 +33,32 @@ function App() {
   const { user } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    socket.emit("join-user", user?.id);
-    console.log("user id is : ", user?.id);
-  }, [user?.id]);
+    if (!user) return;
+
+    // Join room when user state changes
+    if (user.role === "ADMIN") {
+      socket.emit("join-admin");
+    } else {
+      socket.emit("join-user", user.id);
+    }
+    console.log("Joined socket room for: ", user.role);
+
+    // Ensure we rejoin the correct room upon reconnection
+    const handleReconnect = () => {
+      console.log("Socket reconnected. Rejoining room...");
+      if (user.role === "ADMIN") {
+        socket.emit("join-admin");
+      } else {
+        socket.emit("join-user", user.id);
+      }
+    };
+
+    socket.on("connect", handleReconnect);
+
+    return () => {
+      socket.off("connect", handleReconnect);
+    };
+  }, [user]);
 
   return (
     <Router>

@@ -24,11 +24,15 @@ export const createtask = async (req, res) => {
     req.body;
 
   try {
-    io.to(assignedUser).emit("newActivity", {
+    const activityData = {
       activityType: "New Task Added",
       description: title,
       createdAt: new Date(),
-    });
+    };
+
+    io.to(assignedUser).emit("newActivity", activityData);
+    io.to("ADMIN").emit("newActivity", activityData);
+    
     const task = await prisma.task.create({
       data: {
         title,
@@ -235,11 +239,34 @@ export const deleteTask = async (req, res) => {
   const id = req.params.id;
 
   try {
+    const taskToDelete = await prisma.task.findUnique({
+      where: { id },
+      select: { title: true }
+    });
+
     await prisma.task.delete({
       where: {
         id,
       },
     });
+
+    if (taskToDelete) {
+      const description = `Task "${taskToDelete.title}" was deleted.`;
+      await prisma.activity.create({
+        data: {
+          userid: "688f618c-5848-469e-b37e-23b745b5292a", // Admin ID or system user
+          description: description,
+          createdAt: new Date(),
+          activityType: "Task Deleted",
+        },
+      });
+
+      io.to("ADMIN").emit("newActivity", {
+        activityType: "Task Deleted",
+        description: description,
+        createdAt: new Date(),
+      });
+    }
 
     res.status(200).json({
       msg: "Deleted Task successfully",

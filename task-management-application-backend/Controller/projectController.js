@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.config.js";
 import redis from "../config/redis.js";
+import { io } from "../index.js";
 
 export const createProject = async (req, res) => {
   let { projectName, description, startDate, endDate } = req.body;
@@ -21,6 +22,22 @@ export const createProject = async (req, res) => {
         startDate: new Date(startDate).toISOString(),
         status: Status,
       },
+    });
+
+    const descriptionText = `New project "${projectName}" was created.`;
+    await prisma.activity.create({
+      data: {
+        userid: "688f618c-5848-469e-b37e-23b745b5292a", // Admin ID
+        description: descriptionText,
+        createdAt: new Date(),
+        activityType: "New Project",
+      },
+    });
+
+    io.to("ADMIN").emit("newActivity", {
+      activityType: "New Project",
+      description: descriptionText,
+      createdAt: new Date(),
     });
 
     res.status(200).json({
@@ -209,11 +226,35 @@ export const deleteProject = async (req, res) => {
   const id = req.params;
 
   try {
+    const projectToDelete = await prisma.project.findUnique({
+      where: { id: id.id },
+      select: { projectName: true }
+    });
+
     await prisma.project.delete({
       where: {
-        id,
+        id: id.id,
       },
     });
+
+    if (projectToDelete) {
+      const description = `Project "${projectToDelete.projectName}" was deleted.`;
+      
+      await prisma.activity.create({
+        data: {
+          userid: "688f618c-5848-469e-b37e-23b745b5292a", // Admin ID
+          description: description,
+          createdAt: new Date(),
+          activityType: "Project Deleted",
+        },
+      });
+
+      io.to("ADMIN").emit("newActivity", {
+        activityType: "Project Deleted",
+        description: description,
+        createdAt: new Date(),
+      });
+    }
 
     res.status(200).json({
       msg: "project deleted successfully",
