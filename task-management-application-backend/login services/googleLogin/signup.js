@@ -44,7 +44,7 @@ export const googleSignup = async (req, res) => {
       },
     });
 
-    const token = jwt.sign({ data: newUser }, process.env.JWT_SCREET_KEY, {
+    const token = jwt.sign({ data: newUser }, process.env.JWT_SECRET_KEY || process.env.JWT_SCREET_KEY, {
       expiresIn: "1d",
     });
 

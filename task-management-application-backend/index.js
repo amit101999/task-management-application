@@ -71,9 +71,10 @@ app.get("/check", (req, res) => {
   res.send("server isas working fine");
 });
 
-server.listen(process.env.PORT, () => {
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
   console.log("=========================================");
-  console.log(`🚀 Server initialized and running on port ${process.env.PORT}`);
+  console.log(`🚀 Server initialized and running on port ${PORT}`);
   console.log("✅ Express App Started");
   console.log("✅ Socket.IO Server Started");
   console.log("✅ CORS configured for frontend domains");
