@@ -9,7 +9,7 @@ export const userAuth = async (req, res, next) => {
 
     // console.log("Token:", token); // Debugging line to check the token value
     // Verify token
-    const jwtToken = jwt.verify(token, process.env.JWT_SCREET_KEY);
+    const jwtToken = jwt.verify(token, process.env.JWT_SECRET_KEY || process.env.JWT_SCREET_KEY);
 
     req.user = jwtToken.data;
     console.log("Authenticated User:", req.user);

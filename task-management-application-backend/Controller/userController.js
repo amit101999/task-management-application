@@ -28,7 +28,7 @@ export const createUser = async (req, res) => {
     // creating jsonwebtoken
     const token = jwt.sign(
       { data: { id: newUser.id, role: newUser.role, name: newUser.name } },
-      process.env.JWT_SCREET_KEY,
+      process.env.JWT_SECRET_KEY || process.env.JWT_SCREET_KEY,
       {
         expiresIn: "1d",
       }
@@ -47,7 +47,7 @@ export const createUser = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    throw new Error("Error in creating user");
+    res.status(500).json({ message: "Error in creating user" });
   }
 };
 
@@ -100,7 +100,7 @@ export const userLogin = async (req, res) => {
     // create token
     const token = jwt.sign(
       { data: { id: user.id, role: user.role, name: user.name } },
-      process.env.JWT_SCREET_KEY,
+      process.env.JWT_SECRET_KEY || process.env.JWT_SCREET_KEY,
       {
         expiresIn: "1d",
       }

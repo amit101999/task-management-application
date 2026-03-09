@@ -47,7 +47,7 @@ export const createProject = async (req, res) => {
     // res.status(200)
   } catch (err) {
     console.log("Error in creating project ", err);
-    throw new Error("Error in creating project");
+    res.status(500).json({ message: "Error in creating project" });
   }
 };
 
@@ -261,7 +261,7 @@ export const deleteProject = async (req, res) => {
     });
   } catch (err) {
     console.log("Error in deleting project ", err);
-    throw new Error("Error in deleting project");
+    res.status(500).json({ message: "Error in deleting project" });
   }
 };
 
@@ -309,7 +309,6 @@ export const addtaskToProject = async (req, res) => {
       err: err,
       msg: "error is adding Task to project",
     });
-    throw new Error("Error in adding task to project");
   }
 };
 

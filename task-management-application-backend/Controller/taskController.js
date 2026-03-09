@@ -88,7 +88,7 @@ export const createtask = async (req, res) => {
     });
   } catch (err) {
     console.log("Error in ceatingf task", err);
-    throw new Error("Error in creating new task");
+    res.status(500).json({ message: "Error in creating new task" });
   }
 };
 export const getAllTask = async (req, res) => {
@@ -273,7 +273,7 @@ export const deleteTask = async (req, res) => {
     });
   } catch (err) {
     console.log("Error in Task project ", err);
-    throw new Error("Error in Task project");
+    res.status(500).json({ message: "Error in Task project" });
   }
 };
 
@@ -450,7 +450,6 @@ export const addUserToTask = async (req, res) => {
       err: err,
       msg: "error is adding user",
     });
-    throw new Error("Error in adding user to task");
   }
 };
 
