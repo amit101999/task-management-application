@@ -23,10 +23,10 @@ const LoginPage = lazy(() => import("./authComponent/LoginPage"));
 const SignupPage = lazy(() => import("./authComponent/Signup"));
 
 const AuthenticateUserRoutes = lazy(
-  () => import("./HOC/AutenticateUserRoutes")
+  () => import("./HOC/AuthenticateUserRoutes")
 );
 const AuthenticateAdminRoutes = lazy(
-  () => import("./HOC/AutenticateAdminRoutes")
+  () => import("./HOC/AuthenticateAdminRoutes")
 );
 
 function App() {
